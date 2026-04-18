@@ -1,0 +1,93 @@
+{
+	"name": "@plcharriere/svelte-i18n",
+	"version": "0.1.1",
+	"description": "Typed, ICU-aware i18n for SvelteKit 2 + Svelte 5. Path / cookie / domain routing, SSR-safe, full types inferred from your locale files — no codegen.",
+	"keywords": [
+		"svelte",
+		"sveltekit",
+		"i18n",
+		"internationalization",
+		"localization",
+		"l10n",
+		"icu",
+		"intl",
+		"typescript",
+		"ssr"
+	],
+	"license": "MIT",
+	"author": "Paul-Louis Charriere",
+	"homepage": "https://github.com/plcharriere/svelte-i18n#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/plcharriere/svelte-i18n.git"
+	},
+	"bugs": {
+		"url": "https://github.com/plcharriere/svelte-i18n/issues"
+	},
+	"type": "module",
+	"sideEffects": [
+		"**/*.css",
+		"**/*.svelte"
+	],
+	"files": [
+		"dist",
+		"!dist/**/*.test.*",
+		"!dist/**/*.spec.*"
+	],
+	"svelte": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"svelte": "./dist/index.js",
+			"default": "./dist/index.js"
+		},
+		"./server": {
+			"types": "./dist/server.d.ts",
+			"default": "./dist/server.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"publishConfig": {
+		"access": "public",
+		"provenance": false
+	},
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"package": "svelte-kit sync && svelte-package && publint",
+		"prepublishOnly": "pnpm run package",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"test": "vitest run"
+	},
+	"peerDependencies": {
+		"@sveltejs/kit": "^2.0.0",
+		"svelte": "^5.0.0"
+	},
+	"dependencies": {
+		"esm-env": "^1.2.2",
+		"intl-messageformat": "^11.2.1"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"esbuild"
+		]
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-cloudflare": "^7.2.8",
+		"@sveltejs/kit": "^2.57.0",
+		"@sveltejs/package": "^2.5.7",
+		"@sveltejs/vite-plugin-svelte": "^7.0.0",
+		"@types/node": "^25.6.0",
+		"publint": "^0.3.0",
+		"svelte": "^5.55.2",
+		"svelte-check": "^4.4.6",
+		"typescript": "^6.0.2",
+		"vite": "^8.0.7",
+		"vitest": "^4.1.4",
+		"wrangler": "^4.83.0"
+	}
+}
