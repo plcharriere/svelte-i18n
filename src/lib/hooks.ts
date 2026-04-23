@@ -103,15 +103,15 @@ export function getRequestLocale(event: RequestEvent): LanguageCode {
 	return event.locals.i18n?.locale ?? getCurrentConfig().defaultLanguage;
 }
 
-// Matches `href="/..."` on anchor-like tags. Captures the path+query+hash so
-// we can prepend the locale prefix inside the callback. Skips:
+// Matches `href="/..."` or `href='/...'` on anchor-like tags. Captures the
+// quote style and the path+query+hash so we can re-emit the attribute with the
+// same quotes. Skips:
 //   - protocol-relative `//cdn.com/x`
 //   - fragment-only `#top` (doesn't start with `/`)
 //   - mailto:/tel:/http(s): (doesn't start with `/`)
 //   - already-prefixed `/en-GB/...` (filtered in the callback)
-// Only touches double-quoted hrefs — single-quoted is extremely rare in
-// SvelteKit-rendered output. `\shref=` avoids `data-href=` false matches.
-const HREF_RE = /\shref="(\/[^"]*)"/g;
+// `\shref=` avoids `data-href=` false matches.
+const HREF_RE = /\shref=(["'])(\/[^"']*)\1/g;
 
 function rewriteAnchors(
 	html: string,
@@ -119,12 +119,12 @@ function rewriteAnchors(
 	config: ResolvedI18nConfig
 ): string {
 	const prefix = `/${code}`;
-	return html.replace(HREF_RE, (match, href: string) => {
+	return html.replace(HREF_RE, (match, quote: string, href: string) => {
 		if (href.startsWith('//')) return match;
 		const { code: existing } = extractPathLocale(href, config);
 		if (existing) return match;
 		// `/` → `/<code>/`, anything else → `/<code>/rest`
 		const path = href === '/' ? '/' : href;
-		return ` href="${prefix}${path}"`;
+		return ` href=${quote}${prefix}${path}${quote}`;
 	});
 }

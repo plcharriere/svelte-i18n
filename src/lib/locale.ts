@@ -69,14 +69,29 @@ export async function setLocale(code: LanguageCode): Promise<void> {
 	}
 
 	if (config.mode === 'cookie') {
-		if (typeof document === 'undefined') return;
+		if (typeof window === 'undefined') return;
+		const { goto, invalidateAll } = await kit();
 		document.cookie = `${config.cookieName}=${encodeURIComponent(
 			code
 		)}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
-		const { invalidateAll } = await kit();
 		const ctx = getI18nContext();
 		if (ctx) ctx.code = code;
-		await invalidateAll();
+
+		// `?lang=` is an inbound SEO / shareable-URL signal — cookie is the
+		// source of truth for in-app switches. If the URL still asserts a
+		// locale, strip it before invalidating; otherwise the server handle
+		// reads the stale param on the refetch and re-persists the old
+		// locale, overwriting the cookie we just wrote.
+		const url = new URL(window.location.href);
+		if (url.searchParams.has('lang')) {
+			url.searchParams.delete('lang');
+			await goto(url.pathname + url.search + url.hash, {
+				replaceState: true,
+				invalidateAll: true
+			});
+		} else {
+			await invalidateAll();
+		}
 		return;
 	}
 
