@@ -19,18 +19,9 @@ export type I18nContext = {
 
 let code = $state<LanguageCode | undefined>(undefined);
 
-// Register as the client locale source only in the browser. On the server
-// this module is still imported (SSR renders components that use `$state`),
-// but leaving the slot empty means `getActiveLocale()` falls straight
-// through to the ALS-backed server accessor and can never read module-level
-// state that would be shared across concurrent requests.
 if (typeof window !== 'undefined') {
 	setClientLocaleAccessor(() => code);
 
-	// Dev-time HMR: the extract plugin sends `svelte-i18n:locale-changed`
-	// with the fresh dict when a locale file is edited. Prime the cache and
-	// bump the reactive revision counter so every `t()` call re-runs in place
-	// — no page reload, browser state preserved.
 	if (import.meta.hot) {
 		import.meta.hot.on('svelte-i18n:locale-changed', (payload: unknown) => {
 			const { code: c, dict } = (payload ?? {}) as {
@@ -72,20 +63,12 @@ export function createI18nContext(
 	const read = typeof source === 'function' ? source : () => source;
 	if (typeof window === 'undefined') return store;
 
-	// Seed synchronously so the very first render sees primed dictionaries
-	// and the correct active locale — effects run after the initial template
-	// pass. `primeDictionary` has an identity guard, so redundant calls are
-	// cheap no-ops.
 	const initial = read();
 	if (code === undefined) code = initial.locale;
 	primeChain(initial);
 
 	$effect.pre(() => {
 		const data = read();
-		// Prime on every nav, not just locale changes — with per-route key
-		// pruning the dict object differs across routes even at the same
-		// locale, so same-locale navigation still needs to merge new keys in.
-		// `primeDictionary`'s identity guard keeps redundant primes free.
 		primeChain(data);
 		if (code !== data.locale) code = data.locale;
 	});
@@ -96,20 +79,10 @@ export function createI18nContext(
 		document.documentElement.lang = data.locale;
 		document.documentElement.dir = data.rtl ? 'rtl' : 'ltr';
 
-		// Re-apply the server's anchor rewrite in the DOM. `transformPageChunk`
-		// only runs on full SSR responses, so after a client-side locale switch
-		// the rendered DOM still shows the template's literal `href="/about"`.
-		// Walk all anchors and re-prefix — keeps hover previews, copy-link,
-		// and middle-click-open-in-tab consistent with the beforeNavigate
-		// interceptor's click behavior.
 		const config = peekCurrentConfig();
 		if (config?.mode === 'path') rewriteAnchors(data.locale, config);
 	});
 
-	// `beforeNavigate` is mount-scoped — SvelteKit auto-unregisters it when
-	// this component unmounts. Already guaranteed to be in the browser by the
-	// early return above. No dedup guard needed, and re-registering on
-	// remount is correct (previous handler is already gone).
 	beforeNavigate((nav) => {
 		if (isInterceptionSuspended()) return;
 		if (nav.cancel === undefined || !nav.to) return;
@@ -126,9 +99,6 @@ export function createI18nContext(
 
 		nav.cancel();
 		const prefix = `/${active}`;
-		// Preserve the destination's trailing-slash shape: `/` → `/<code>/`,
-		// `/about` → `/<code>/about`. `/` with no prefix means "directory
-		// root", so the prefixed form should keep that semantic.
 		const target = `${prefix}${nav.to.url.pathname}${nav.to.url.search}${nav.to.url.hash}`;
 		goto(target, { replaceState: false });
 	});
@@ -141,9 +111,6 @@ export function getI18nContext(): I18nContext | undefined {
 	return store;
 }
 
-// Walk every `<a href="/...">` in the DOM and rewrite to the current locale.
-// Idempotent — we always strip any existing locale prefix first, so switching
-// `fr` → `en` (default) correctly drops `/fr/...` back to `/...`.
 function rewriteAnchors(
 	current: LanguageCode,
 	config: ResolvedI18nConfig
@@ -165,4 +132,3 @@ function rewriteAnchor(
 	const target = `${prefix}${path}`;
 	if (a.getAttribute('href') !== target) a.setAttribute('href', target);
 }
-

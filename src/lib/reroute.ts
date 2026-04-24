@@ -3,11 +3,6 @@ import { getCurrentConfig } from './config.ts';
 import { extractPathLocale } from './path-locale.ts';
 import type { LanguageCode } from './types.ts';
 
-// Shared (client + server) hooks. SvelteKit's `reroute` and locale-reading
-// helpers must run on both sides, so this module is intentionally kept free
-// of server-only deps — importing it never pulls in `ssr-store.ts` or
-// `node:async_hooks`.
-
 export function createI18nReroute(): Reroute {
 	return ({ url }: { url: URL }) => {
 		const config = getCurrentConfig();

@@ -91,9 +91,6 @@ export function fallbackChain(
 	return chain;
 }
 
-// Module-scoped singleton holding the resolved config. Written once by
-// `createI18n()`; read by every runtime helper (`t`, `setLocale`, seo, etc.)
-// so they don't need to be threaded the config on every call.
 let current: ResolvedI18nConfig | undefined;
 
 export function setCurrentConfig(config: ResolvedI18nConfig): void {

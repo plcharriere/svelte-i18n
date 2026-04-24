@@ -1,12 +1,5 @@
 import { createI18n } from "$lib";
 
-// Everything lives in one map: metadata + loader per language. `t()` is fully
-// typed against the merged schema derived from each `load()`'s return type —
-// no tuple, no barrel, no `declare global`, no codegen. Adding a locale means
-// adding one entry below.
-// Only `t` is re-exported from here — it's the one function that has to carry
-// your schema type. `setLocale`, `getCurrentLocale`, `getLocales`, and
-// `getSeoLinks` are schema-agnostic; import them directly from `$lib`.
 export const { t } = createI18n({
   mode: "path",
   defaultLanguage: "en",

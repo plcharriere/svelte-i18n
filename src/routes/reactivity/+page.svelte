@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getCurrentLocale, getLocales, setLocale } from '$lib';
+	import { pageTitle } from '../../page-title';
 	import { t } from '../../i18n';
 	import BrokenCard from './BrokenCard.svelte';
 	import CorrectCard from './CorrectCard.svelte';
@@ -43,7 +44,7 @@
 </script>
 
 <svelte:head>
-	<title>{t('reactivity.heading')}</title>
+	<title>{pageTitle(t('reactivity.heading'))}</title>
 </svelte:head>
 
 <h1>{t('reactivity.heading')}</h1>

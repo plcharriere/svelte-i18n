@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { pageTitle } from '../../page-title';
 	import { t } from '../../i18n';
 
 	let place = $state(1);
@@ -6,7 +7,7 @@
 </script>
 
 <svelte:head>
-	<title>{t('ordinals.title')}</title>
+	<title>{pageTitle(t('ordinals.title'))}</title>
 </svelte:head>
 
 <h1>{t('ordinals.title')}</h1>

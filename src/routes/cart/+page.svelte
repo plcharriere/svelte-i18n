@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { pageTitle } from '../../page-title';
 	import { t } from '../../i18n';
 
 	let itemsCount = $state(1);
@@ -7,7 +8,7 @@
 </script>
 
 <svelte:head>
-	<title>{t('cart.title')}</title>
+	<title>{pageTitle(t('cart.title'))}</title>
 </svelte:head>
 
 <h1>{t('cart.title')}</h1>

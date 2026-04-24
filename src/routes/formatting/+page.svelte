@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { getCurrentLocale } from '$lib';
+	import { pageTitle } from '../../page-title';
 	import { t } from '../../i18n';
 
-	// One piece of live state drives every formatter. Switching locale via the
-	// header re-renders — `t()` calls are reactive because they're inline.
 	let now = $state(new Date());
 	let amount = $state(1234.5);
 	let count = $state(1_250_000);
@@ -15,7 +14,7 @@
 </script>
 
 <svelte:head>
-	<title>{t('formatting.title')}</title>
+	<title>{pageTitle(t('formatting.title'))}</title>
 </svelte:head>
 
 <h1>{t('formatting.title')}</h1>

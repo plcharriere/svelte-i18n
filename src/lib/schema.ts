@@ -3,10 +3,6 @@ import type { Dictionary, TypedMessageBrand } from './types.ts';
 import { warn } from './warnings.ts';
 
 export function schema<T extends Dictionary>(obj: T): T {
-	// Dotted keys are caught at edit-time by `Leaves<T>` producing malformed
-	// paths, but we still run the runtime walk in dev as a belt-and-braces
-	// guard. `esm-env` exposes DEV in a bundler-agnostic way so the check is
-	// stripped from prod bundles across Vite / Rollup / webpack alike.
 	if (DEV) validateSchemaKeys(obj);
 	return obj;
 }

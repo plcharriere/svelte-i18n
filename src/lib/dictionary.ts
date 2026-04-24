@@ -10,18 +10,11 @@ type FlatEntry = { locale: LanguageCode; message: string };
 
 const cache: Map<LanguageCode, Dictionary> = new Map();
 const pending: Map<LanguageCode, Promise<Dictionary>> = new Map();
-// Per-active-locale flat view with the fallback chain already merged.
-// Built lazily on first lookup, dropped whenever any dictionary is re-primed
-// (cheap — flatten is O(keys) and only runs on locale switch / hydration).
 const flatCache: Map<LanguageCode, Map<string, FlatEntry>> = new Map();
 
 export function primeDictionary(code: LanguageCode, dict: Dictionary): void {
-	// Skip identical re-prime: during hydration `primeChain` hands us the same
-	// object references across multiple locales; no need to nuke the flat cache
-	// if nothing changed.
 	if (cache.get(code) === dict) return;
 	cache.set(code, dict);
-	// Any prime can affect a descendant locale's merged view — drop all.
 	flatCache.clear();
 }
 
@@ -78,8 +71,6 @@ function flattenInto(
 		const value = dict[key];
 		const path = prefix ? `${prefix}.${key}` : key;
 		if (typeof value === 'string') {
-			// First writer wins — because we walk the chain child → ancestor,
-			// the child's string is set before any ancestor can overwrite it.
 			if (!out.has(path)) out.set(path, { locale, message: value });
 		} else if (value && typeof value === 'object') {
 			flattenInto(value as Dictionary, path, locale, out);
@@ -103,8 +94,6 @@ function getFlatView(
 	return flat;
 }
 
-// Once-only warn dedup: a template with dozens of `t()` calls would otherwise
-// spam the console on every render for any key resolved via fallback.
 const warnedFallback = new Set<string>();
 const warnedMissing = new Set<string>();
 
@@ -138,8 +127,6 @@ export function resolveMessage(
 	return entry;
 }
 
-// Test-only: reset every per-module cache so suites can run in isolation.
-// Not part of the public runtime surface.
 export function clearDictionaryCache(): void {
 	cache.clear();
 	pending.clear();

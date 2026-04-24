@@ -9,9 +9,6 @@
 		onAdd: (name: string) => void;
 	} = $props();
 
-	// BROKEN — `t()` is called once during component init. The returned strings
-	// are captured into these `const`s and never re-evaluated, so switching the
-	// active locale leaves this card stuck on the locale it first rendered in.
 	// svelte-ignore state_referenced_locally
 	const addToCartLabel = t('reactivity.addToCart');
 	// svelte-ignore state_referenced_locally

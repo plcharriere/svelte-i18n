@@ -6,9 +6,6 @@ import { getActiveLocale } from './active-locale.ts';
 import { warn } from './warnings.ts';
 import type { LanguageCode, LocaleInfo } from './types.ts';
 
-// Public active-locale API. Reads from the resolved config singleton plus the
-// locale signal (context / ALS) — no arguments needed at the call site.
-
 export function getCurrentLocale(): LocaleInfo {
 	const config = getCurrentConfig();
 	const code = getActiveLocale() ?? config.defaultLanguage;
@@ -51,10 +48,6 @@ export async function setLocale(code: LanguageCode): Promise<void> {
 		const current = window.location.pathname;
 		const { rest } = extractPathLocale(current, config);
 		const prefix = code === config.defaultLanguage ? '' : `/${code}`;
-		// Preserve the page's own trailing-slash shape when re-prefixing:
-		// `/` → `/<code>/`, `/about` → `/<code>/about`. Matches the output
-		// of `beforeNavigate` in context.svelte.ts so both entry points
-		// agree on canonical form.
 		const target =
 			`${prefix}${rest}${window.location.search}${window.location.hash}` || '/';
 		const release = suspendInterception();
@@ -77,11 +70,6 @@ export async function setLocale(code: LanguageCode): Promise<void> {
 		const ctx = getI18nContext();
 		if (ctx) ctx.code = code;
 
-		// `?lang=` is an inbound SEO / shareable-URL signal — cookie is the
-		// source of truth for in-app switches. If the URL still asserts a
-		// locale, strip it before invalidating; otherwise the server handle
-		// reads the stale param on the refetch and re-persists the old
-		// locale, overwriting the cookie we just wrote.
 		const url = new URL(window.location.href);
 		if (url.searchParams.has('lang')) {
 			url.searchParams.delete('lang');

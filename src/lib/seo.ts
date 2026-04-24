@@ -10,8 +10,6 @@ export type SeoContext = {
 
 export function getSeoLinks(context?: SeoContext): SeoLinks | undefined {
 	const config = getCurrentConfig();
-	// Short-circuit when SEO is disabled on createI18n() — callers can wire
-	// `seo: getSeoLinks(...)` unconditionally and the payload stays empty.
 	if (!config.seo) return undefined;
 	const url = new URL(
 		typeof context?.url === 'string'
@@ -57,10 +55,6 @@ function buildLocaleHref(
 ): string {
 	const isDefault = code === config.defaultLanguage;
 	if (config.mode === 'path') {
-		// Default locale is always unprefixed — one canonical shape per page.
-		// Keeping `/en/about` alongside `/about` would advertise two URLs for
-		// the same content to crawlers, which is exactly what hreflang is
-		// meant to prevent.
 		const prefix = isDefault ? '' : `/${code}`;
 		const pathPart = canonicalPath === '/' ? '' : canonicalPath;
 		const target = new URL(url);
@@ -82,7 +76,6 @@ function buildLocaleHref(
 		target.search = qs ? `?${qs}` : '';
 		return target.toString();
 	}
-	// domain
 	const def = config.languages[code];
 	const host = def?.domains?.[0];
 	if (!host) return url.toString();

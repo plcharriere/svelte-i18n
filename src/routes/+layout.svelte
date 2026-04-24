@@ -9,9 +9,6 @@
 	const locales = getLocales();
 	const current = $derived(getCurrentLocale().code);
 
-	// The reroute strips the locale prefix, so `page.route.id` is the
-	// canonical path ("/", "/cart", "/formatting", ...). Compare against that
-	// so `/fr/cart` and `/cart` both highlight "Cart".
 	const activeRoute = $derived(page.route.id ?? '/');
 	function isActive(href: string) {
 		return href === '/' ? activeRoute === '/' : activeRoute === href;

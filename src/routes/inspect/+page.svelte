@@ -2,10 +2,9 @@
 	import { page } from '$app/state';
 	import { getCurrentLocale } from '$lib';
 	import type { Dictionary, I18nPageData } from '$lib';
+	import { pageTitle } from '../../page-title';
 	import { t } from '../../i18n';
 
-	// Flatten a nested dict to (dottedKey, value) pairs. Values are ICU
-	// templates as-authored — the same strings `t()` would format at runtime.
 	function flatten(obj: Dictionary, prefix = ''): Array<{ key: string; value: string }> {
 		const out: Array<{ key: string; value: string }> = [];
 		for (const k of Object.keys(obj)) {
@@ -32,7 +31,7 @@
 </script>
 
 <svelte:head>
-	<title>{t('nav.inspect')}</title>
+	<title>{pageTitle(t('nav.inspect'))}</title>
 </svelte:head>
 
 <h1>{t('nav.inspect')}</h1>

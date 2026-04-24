@@ -3,8 +3,6 @@
 	import { createI18nContext } from './context.svelte.ts';
 	import type { I18nPageData } from './types.ts';
 
-	// Read the library's slice of page data from `page.data.i18n`. Keeping it
-	// namespaced leaves `page.data.seo`, `.user`, etc. free for userland.
 	const read = () =>
 		(page.data as { i18n: I18nPageData }).i18n;
 

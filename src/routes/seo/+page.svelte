@@ -1,15 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { pageTitle } from '../../page-title';
 	import { t } from '../../i18n';
 
-	// Root `+layout.server.ts` already calls `getSeoLinks({ url, locale })` and
-	// returns it on `data.i18n.seo`. Read it from `$app/state` so this page
-	// shows exactly what the server rendered into `<head>`.
 	const seo = $derived(page.data.i18n?.seo);
 </script>
 
 <svelte:head>
-	<title>{t('seo.title')}</title>
+	<title>{pageTitle(t('seo.title'))}</title>
 </svelte:head>
 
 <h1>{t('seo.title')}</h1>

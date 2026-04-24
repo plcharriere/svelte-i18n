@@ -28,7 +28,6 @@ function getFormatter(locale: string, message: string): IntlMessageFormat {
 	return formatter;
 }
 
-// Extract referenced argument names + their kind by inspecting formatjs AST.
 function collectArgInfo(message: string, formatter: IntlMessageFormat): ArgInfo {
 	const cached = argInfoCache.get(message);
 	if (cached) return cached;
@@ -45,8 +44,6 @@ function walkAst(nodes: unknown[], info: ArgInfo): void {
 		const n = node as Record<string, unknown>;
 		const type = n.type;
 		const value = n.value as string | undefined;
-		// formatjs AST types: 0 literal, 1 argument, 2 number, 3 date, 4 time,
-		// 5 select, 6 plural, 7 pound, 8 tag.
 		if (type === 1 && value) {
 			if (!info.has(value)) info.set(value, { type: 'variable' });
 		} else if (type === 2 && value) {
@@ -82,8 +79,6 @@ export function formatMessage(
 		const formatter = getFormatter(locale, message);
 		const info = collectArgInfo(message, formatter);
 
-		// Fast path: no args referenced — format directly, no allocations.
-		// Covers plain string leaves and messages with hard-coded text.
 		let input: Record<string, unknown> | undefined = params;
 		if (info.size > 0) {
 			let missing: Record<string, unknown> | null = null;
@@ -116,8 +111,6 @@ export function formatMessage(
 				? result.join('')
 				: String(result ?? '');
 	} catch (err) {
-		// A strict-mode warn() inside the try (missing-param) re-enters this
-		// catch; propagate it instead of replacing with a confusing icu-error.
 		const msg = (err as Error).message ?? '';
 		if (msg.startsWith('[svelte-i18n]')) throw err;
 		warn(
@@ -128,8 +121,6 @@ export function formatMessage(
 	}
 }
 
-// Test-only: reset formatter + AST caches so suites can run in isolation.
-// Not part of the public runtime surface.
 export function clearIcuCache(): void {
 	formatterCache.clear();
 	argInfoCache.clear();

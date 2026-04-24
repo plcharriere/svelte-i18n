@@ -2,11 +2,6 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { extractPathLocale } from './path-locale.ts';
 import type { LanguageCode, ResolvedI18nConfig } from './types.ts';
 
-// Server-only resolvers. Touched only by `hooks.ts`, which is reachable
-// exclusively via the `./server` entry — so nothing in here ships to the
-// browser. Path-segment extraction lives in `path-locale.ts` because the
-// client needs it too.
-
 export function resolvePathLocale(
 	url: URL,
 	config: ResolvedI18nConfig
@@ -53,7 +48,6 @@ export function resolveActiveLocale(
 		const res = resolveCookieLocale(event, config);
 		return { code: res.code, persistCookie: res.persist };
 	}
-	// domain
 	const match = resolveDomainLocale(event.url, config);
 	if (match) return { code: match };
 	if (config.domainFallback === 'reject') {

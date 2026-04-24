@@ -9,8 +9,6 @@
 		onAdd: (name: string) => void;
 	} = $props();
 
-	// CORRECT — `$derived` wraps the `t()` call in a reactive getter; each
-	// read re-runs when the active locale `$state` changes.
 	const priceLabel = $derived(t('reactivity.price', { amount: product.price }));
 </script>
 
@@ -18,7 +16,6 @@
 	<h3>{product.name}</h3>
 	<p class="price">{priceLabel}</p>
 	{#if product.inStock}
-		<!-- Inline template calls are also reactive — no `$derived` needed. -->
 		<button type="button" onclick={() => onAdd(product.name)}>{t('reactivity.addToCart')}</button>
 	{:else}
 		<span class="oos">{t('reactivity.outOfStock')}</span>
