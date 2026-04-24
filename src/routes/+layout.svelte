@@ -34,7 +34,7 @@
 			<a href="/ordinals" class:active={isActive('/ordinals')} aria-current={isActive('/ordinals') ? 'page' : undefined}>{t('nav.ordinals')}</a>
 			<a href="/reactivity" class:active={isActive('/reactivity')} aria-current={isActive('/reactivity') ? 'page' : undefined}>{t('nav.reactivity')}</a>
 			<a href="/seo" class:active={isActive('/seo')} aria-current={isActive('/seo') ? 'page' : undefined}>{t('nav.seo')}</a>
-			<a href="/about" class:active={isActive('/about')} aria-current={isActive('/about') ? 'page' : undefined}>{t('nav.about')}</a>
+			<a href="/inspect" class:active={isActive('/inspect')} aria-current={isActive('/inspect') ? 'page' : undefined}>{t('nav.inspect')}</a>
 		</nav>
 		<label class="locale-select">
 			<span class="sr">{t('common.language')}</span>

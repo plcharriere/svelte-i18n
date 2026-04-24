@@ -4,6 +4,7 @@ import { primeDictionary } from './dictionary.ts';
 import { extractPathLocale } from './path-locale.ts';
 import { peekCurrentConfig } from './config.ts';
 import { isInterceptionSuspended } from './intercept.ts';
+import { bumpTranslationRevision } from './t.svelte.ts';
 import type {
 	Dictionary,
 	I18nPageData,
@@ -25,6 +26,22 @@ let code = $state<LanguageCode | undefined>(undefined);
 // state that would be shared across concurrent requests.
 if (typeof window !== 'undefined') {
 	setClientLocaleAccessor(() => code);
+
+	// Dev-time HMR: the extract plugin sends `svelte-i18n:locale-changed`
+	// with the fresh dict when a locale file is edited. Prime the cache and
+	// bump the reactive revision counter so every `t()` call re-runs in place
+	// — no page reload, browser state preserved.
+	if (import.meta.hot) {
+		import.meta.hot.on('svelte-i18n:locale-changed', (payload: unknown) => {
+			const { code: c, dict } = (payload ?? {}) as {
+				code?: LanguageCode;
+				dict?: Dictionary;
+			};
+			if (!c || !dict) return;
+			primeDictionary(c, dict);
+			bumpTranslationRevision();
+		});
+	}
 }
 
 const store: I18nContext = {
@@ -42,14 +59,11 @@ const store: I18nContext = {
 	}
 };
 
-let primedForLocale: LanguageCode | undefined = undefined;
-
 function primeChain(data: I18nPageData): void {
 	if (!data.dictionaries) return;
 	for (const [c, dict] of Object.entries(data.dictionaries)) {
 		primeDictionary(c, dict as Dictionary);
 	}
-	primedForLocale = data.locale;
 }
 
 export function createI18nContext(
@@ -60,18 +74,19 @@ export function createI18nContext(
 
 	// Seed synchronously so the very first render sees primed dictionaries
 	// and the correct active locale — effects run after the initial template
-	// pass. Guarded by `primedForLocale` so subsequent mounts are no-ops.
+	// pass. `primeDictionary` has an identity guard, so redundant calls are
+	// cheap no-ops.
 	const initial = read();
 	if (code === undefined) code = initial.locale;
-	if (primedForLocale !== initial.locale) primeChain(initial);
+	primeChain(initial);
 
 	$effect.pre(() => {
 		const data = read();
-		// Re-prime only when the locale actually changes. Same-locale nav is a
-		// no-op — no dictionary work, no unnecessary reactivity churn.
-		// Keyed off `data.locale` (a primitive) because `$props` proxies don't
-		// guarantee stable-identity comparison for nested object fields.
-		if (primedForLocale !== data.locale) primeChain(data);
+		// Prime on every nav, not just locale changes — with per-route key
+		// pruning the dict object differs across routes even at the same
+		// locale, so same-locale navigation still needs to merge new keys in.
+		// `primeDictionary`'s identity guard keeps redundant primes free.
+		primeChain(data);
 		if (code !== data.locale) code = data.locale;
 	});
 
@@ -92,32 +107,31 @@ export function createI18nContext(
 	});
 
 	// `beforeNavigate` is mount-scoped — SvelteKit auto-unregisters it when
-	// this component unmounts. No dedup guard needed, and re-registering on
+	// this component unmounts. Already guaranteed to be in the browser by the
+	// early return above. No dedup guard needed, and re-registering on
 	// remount is correct (previous handler is already gone).
-	if (typeof window !== 'undefined') {
-		beforeNavigate((nav) => {
-			if (isInterceptionSuspended()) return;
-			if (nav.cancel === undefined || !nav.to) return;
-			if (nav.to.url.origin !== window.location.origin) return;
+	beforeNavigate((nav) => {
+		if (isInterceptionSuspended()) return;
+		if (nav.cancel === undefined || !nav.to) return;
+		if (nav.to.url.origin !== window.location.origin) return;
 
-			const config = peekCurrentConfig();
-			if (!config || config.mode !== 'path') return;
+		const config = peekCurrentConfig();
+		if (!config || config.mode !== 'path') return;
 
-			const { code: urlCode } = extractPathLocale(nav.to.url.pathname, config);
-			if (urlCode) return;
+		const { code: urlCode } = extractPathLocale(nav.to.url.pathname, config);
+		if (urlCode) return;
 
-			const active = store.code;
-			if (active === config.defaultLanguage) return;
+		const active = store.code;
+		if (active === config.defaultLanguage) return;
 
-			nav.cancel();
-			const prefix = `/${active}`;
-			// Preserve the destination's trailing-slash shape: `/` → `/<code>/`,
-			// `/about` → `/<code>/about`. `/` with no prefix means "directory
-			// root", so the prefixed form should keep that semantic.
-			const target = `${prefix}${nav.to.url.pathname}${nav.to.url.search}${nav.to.url.hash}`;
-			goto(target, { replaceState: false });
-		});
-	}
+		nav.cancel();
+		const prefix = `/${active}`;
+		// Preserve the destination's trailing-slash shape: `/` → `/<code>/`,
+		// `/about` → `/<code>/about`. `/` with no prefix means "directory
+		// root", so the prefixed form should keep that semantic.
+		const target = `${prefix}${nav.to.url.pathname}${nav.to.url.search}${nav.to.url.hash}`;
+		goto(target, { replaceState: false });
+	});
 
 	return store;
 }

@@ -26,9 +26,9 @@ export default schema({
 				title: 'Enlaces SEO',
 				body: 'Canonical, hreflang y x-default — una URL por página.'
 			},
-			about: {
-				title: 'Acerca',
-				body: 'Qué cubre esta demo y cómo ejecutarla.'
+			inspect: {
+				title: 'Alcance por ruta',
+				body: 'Mira exactamente qué claves envió el servidor para esta página.'
 			}
 		}
 	},
@@ -40,17 +40,12 @@ export default schema({
 	},
 	nav: {
 		home: 'Inicio',
-		about: 'Acerca',
+		inspect: 'Inspeccionar',
 		cart: 'Carrito',
 		formatting: 'Formato',
 		ordinals: 'Ordinales',
 		reactivity: 'Reactividad',
 		seo: 'SEO'
-	},
-	about: {
-		title: 'Acerca',
-		body: 'Esta demo prueba la librería svelte-i18n.',
-		hint: 'Usa el selector de idioma de la cabecera — navegación, textos, fechas, plurales y ordinales cambian sin recargar.'
 	},
 	cart: {
 		title: 'Mi carrito',
@@ -136,5 +131,26 @@ export default schema({
 			female: 'mujer',
 			other: 'otro'
 		}
+	},
+	modal: {
+		title: 'Añadido al carrito',
+		body: typed<{ name: string }>('{name} ya está en tu carrito.'),
+		close: 'Cerrar'
+	},
+	inspect: {
+		subtitle:
+			'Exactamente lo que el servidor envió a esta página, para cada idioma de la cadena de respaldo. Cambia de idioma — el conjunto se actualiza.',
+		routeLabel: 'Ruta',
+		activeLabel: 'Idioma activo',
+		chainLabel: 'Cadena de respaldo',
+		payloadLabel: 'Carga útil',
+		payload: typed<{ bytes: number }>(
+			'{bytes, number} bytes (JSON sin comprimir)'
+		),
+		keyCount: typed<{ count: number }>(
+			'{count, plural, =0 {ninguna clave} one {# clave} other {# claves}}'
+		),
+		noKeys: 'Sin claves.',
+		activeBadge: 'activo'
 	}
 });

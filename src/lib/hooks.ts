@@ -1,10 +1,11 @@
-import type { Handle, RequestEvent, Reroute } from '@sveltejs/kit';
+import type { Handle } from '@sveltejs/kit';
 import { setServerLocaleAccessor } from './active-locale.ts';
-import { fallbackChain } from './config.ts';
+import { fallbackChain, getCurrentConfig } from './config.ts';
 import { getCachedDictionary, loadChain } from './dictionary.ts';
+import { manifest as builtinManifest } from './manifest.ts';
 import { extractPathLocale } from './path-locale.ts';
+import { pruneDicts } from './prune.ts';
 import { resolveActiveLocale } from './resolver.ts';
-import { getCurrentConfig } from './config.ts';
 import { getServerLocale, runWithI18n } from './ssr-store.ts';
 import type {
 	Dictionary,
@@ -17,14 +18,27 @@ import type {
 // module, which is only reachable via `@plcharriere/svelte-i18n/server`, so
 // `node:async_hooks` never ends up in the client graph.
 setServerLocaleAccessor(getServerLocale);
-// I18nPageData is re-used structurally by I18nLocals below.
 
 // Populated on `event.locals.i18n` by the server handle. Same shape as the
 // client-side `I18nPageData` but with required fields since the server
 // always produces them.
 export type I18nLocals = Required<Omit<I18nPageData, 'seo'>>;
 
-export function createI18nHandle(): Handle {
+// Per-route key manifest. The Vite plugin populates `manifest.ts` at build
+// time; without the plugin it stays empty and the handle ships full dicts.
+// Consumers can also pass an explicit `keyManifest` to override the default.
+export interface I18nKeyManifest {
+	routes: Record<string, string[]>;
+}
+
+export interface I18nHandleOptions {
+	/** Per-route key manifest. Defaults to the one emitted by the Vite plugin
+	 * (`svelteI18n()`). Provide explicitly to override or to supply your own. */
+	keyManifest?: I18nKeyManifest;
+}
+
+export function createI18nHandle(options: I18nHandleOptions = {}): Handle {
+	const manifest = options.keyManifest ?? builtinManifest;
 	return async ({ event, resolve }) => {
 		const config = getCurrentConfig();
 		const resolution = resolveActiveLocale(event, config);
@@ -50,10 +64,22 @@ export function createI18nHandle(): Handle {
 			const dict = getCachedDictionary(code);
 			if (dict) dictionaries[code] = dict;
 		}
+
+		// Prune to the keys this route statically uses. The fallback-aware
+		// projection lets each ancestor ship only the keys its descendant is
+		// missing — a complete locale's fallback ships as `{}`. Unknown routes
+		// (missing from the manifest) keep the full dict so runtime `t()` calls
+		// don't silently fail — better to over-ship than to break.
+		const routeId = event.route?.id;
+		const allowed = manifest && routeId ? manifest.routes[routeId] : undefined;
+		const deliveredDicts = allowed
+			? pruneDicts(chain, dictionaries, allowed)
+			: dictionaries;
+
 		event.locals.i18n = {
 			locale: resolution.code,
 			rtl,
-			dictionaries
+			dictionaries: deliveredDicts
 		};
 
 		const dir = rtl ? 'rtl' : 'ltr';
@@ -89,20 +115,6 @@ export function createI18nHandle(): Handle {
 	};
 }
 
-export function createI18nReroute(): Reroute {
-	return ({ url }: { url: URL }) => {
-		const config = getCurrentConfig();
-		if (config.mode !== 'path') return undefined;
-		const { code, rest } = extractPathLocale(url.pathname, config);
-		if (!code) return undefined;
-		return rest;
-	};
-}
-
-export function getRequestLocale(event: RequestEvent): LanguageCode {
-	return event.locals.i18n?.locale ?? getCurrentConfig().defaultLanguage;
-}
-
 // Matches `href="/..."` or `href='/...'` on anchor-like tags. Captures the
 // quote style and the path+query+hash so we can re-emit the attribute with the
 // same quotes. Skips:
@@ -128,3 +140,4 @@ function rewriteAnchors(
 		return ` href=${quote}${prefix}${path}${quote}`;
 	});
 }
+

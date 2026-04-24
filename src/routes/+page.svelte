@@ -36,9 +36,9 @@
 		<h2>{t('home.features.seo.title')}</h2>
 		<p class="muted">{t('home.features.seo.body')}</p>
 	</a>
-	<a class="card feature" href="/about">
-		<h2>{t('home.features.about.title')}</h2>
-		<p class="muted">{t('home.features.about.body')}</p>
+	<a class="card feature" href="/inspect">
+		<h2>{t('home.features.inspect.title')}</h2>
+		<p class="muted">{t('home.features.inspect.body')}</p>
 	</a>
 </section>
 

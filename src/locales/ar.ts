@@ -26,9 +26,9 @@ export default schema({
 				title: 'روابط SEO',
 				body: 'canonical و hreflang و x-default — رابط واحد لكل صفحة.'
 			},
-			about: {
-				title: 'حول',
-				body: 'ما تغطيه هذه الديمو وكيفية تشغيلها.'
+			inspect: {
+				title: 'نطاق لكل مسار',
+				body: 'اطّلع بالضبط على المفاتيح التي أرسلها الخادم لهذه الصفحة.'
 			}
 		}
 	},
@@ -40,17 +40,12 @@ export default schema({
 	},
 	nav: {
 		home: 'الرئيسية',
-		about: 'حول',
+		inspect: 'فحص',
 		cart: 'السلة',
 		formatting: 'التنسيق',
 		ordinals: 'الترتيب',
 		reactivity: 'التفاعلية',
 		seo: 'SEO'
-	},
-	about: {
-		title: 'حول',
-		body: 'هذا العرض يختبر مكتبة svelte-i18n.',
-		hint: 'استخدم مبدّل اللغة في الأعلى — القوائم والنصوص والتواريخ والجموع والأعداد الترتيبية تتحدث دون إعادة تحميل.'
 	},
 	cart: {
 		title: 'سلتي',
@@ -135,5 +130,26 @@ export default schema({
 			female: 'أنثى',
 			other: 'آخر'
 		}
+	},
+	modal: {
+		title: 'تمت الإضافة إلى السلة',
+		body: typed<{ name: string }>('{name} الآن في سلتك.'),
+		close: 'إغلاق'
+	},
+	inspect: {
+		subtitle:
+			'بالضبط ما أرسله الخادم إلى هذه الصفحة، لكل لغة في سلسلة الاحتياط. بدّل اللغة — تتحدث المجموعة.',
+		routeLabel: 'المسار',
+		activeLabel: 'اللغة النشطة',
+		chainLabel: 'سلسلة الاحتياط',
+		payloadLabel: 'الحمولة',
+		payload: typed<{ bytes: number }>(
+			'{bytes, number} بايت (JSON غير مضغوط)'
+		),
+		keyCount: typed<{ count: number }>(
+			'{count, plural, zero {لا مفاتيح} one {مفتاح واحد} two {مفتاحان} few {# مفاتيح} many {# مفتاحًا} other {# مفتاح}}'
+		),
+		noKeys: 'لا مفاتيح.',
+		activeBadge: 'نشطة'
 	}
 });

@@ -26,9 +26,9 @@ export default schema({
 				title: 'SEO links',
 				body: 'Canonical, hreflang alternates, and x-default — one URL per page.'
 			},
-			about: {
-				title: 'About',
-				body: 'What this demo covers and how to run it locally.'
+			inspect: {
+				title: 'Per-route scoping',
+				body: 'See exactly which keys the server shipped for the current page.'
 			}
 		}
 	},
@@ -40,17 +40,12 @@ export default schema({
 	},
 	nav: {
 		home: 'Home',
-		about: 'About',
+		inspect: 'Inspect',
 		cart: 'Cart',
 		formatting: 'Formatting',
 		ordinals: 'Ordinals',
 		reactivity: 'Reactivity',
 		seo: 'SEO'
-	},
-	about: {
-		title: 'About',
-		body: 'This demo exercises the svelte-i18n library.',
-		hint: 'Use the locale picker in the header to flip every page — nav, body, dates, plurals and ordinals all update without a full reload.'
 	},
 	cart: {
 		title: 'My cart',
@@ -139,5 +134,26 @@ export default schema({
 			female: 'female',
 			other: 'other'
 		}
+	},
+	modal: {
+		title: 'Added to cart',
+		body: typed<{ name: string }>('{name} is now in your cart.'),
+		close: 'Close'
+	},
+	inspect: {
+		subtitle:
+			'Exactly what the server shipped to this page, for every locale in the fallback chain. Switch locale — the set refreshes.',
+		routeLabel: 'Route',
+		activeLabel: 'Active locale',
+		chainLabel: 'Fallback chain',
+		payloadLabel: 'Payload',
+		payload: typed<{ bytes: number }>(
+			'{bytes, number} bytes (uncompressed JSON)'
+		),
+		keyCount: typed<{ count: number }>(
+			'{count, plural, =0 {no keys} one {# key} other {# keys}}'
+		),
+		noKeys: 'No keys.',
+		activeBadge: 'active'
 	}
 });

@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { t } from '../../i18n';
 
-	let { product }: { product: { name: string; price: number; inStock: boolean } } = $props();
+	let {
+		product,
+		onAdd
+	}: {
+		product: { name: string; price: number; inStock: boolean };
+		onAdd: (name: string) => void;
+	} = $props();
 
 	// BROKEN — `t()` is called once during component init. The returned strings
 	// are captured into these `const`s and never re-evaluated, so switching the
@@ -18,7 +24,7 @@
 	<h3>{product.name}</h3>
 	<p class="price">{priceLabel}</p>
 	{#if product.inStock}
-		<button type="button">{addToCartLabel}</button>
+		<button type="button" onclick={() => onAdd(product.name)}>{addToCartLabel}</button>
 	{:else}
 		<span class="oos">{outOfStockLabel}</span>
 	{/if}

@@ -1,7 +1,7 @@
 {
 	"name": "@plcharriere/svelte-i18n",
-	"version": "0.1.1",
-	"description": "Typed, ICU-aware i18n for SvelteKit 2 + Svelte 5. Path / cookie / domain routing, SSR-safe, full types inferred from your locale files — no codegen.",
+	"version": "0.2.0",
+	"description": "Typed, ICU-aware, SSR-safe i18n for SvelteKit 2 + Svelte 5 with per-route scoping.",
 	"keywords": [
 		"svelte",
 		"sveltekit",
@@ -45,6 +45,10 @@
 		"./server": {
 			"types": "./dist/server.d.ts",
 			"default": "./dist/server.js"
+		},
+		"./vite": {
+			"types": "./dist/plugin.d.ts",
+			"default": "./dist/plugin.js"
 		},
 		"./package.json": "./package.json"
 	},

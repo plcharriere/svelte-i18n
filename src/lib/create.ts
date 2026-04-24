@@ -1,5 +1,5 @@
 import { normalizeConfig, setCurrentConfig } from './config.ts';
-import { t as rawT } from './t.ts';
+import { t as rawT } from './t.svelte.ts';
 import type {
 	I18nConfig,
 	LanguagesMap,

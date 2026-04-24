@@ -960,3 +960,71 @@ t('cart.title');
 t('cart.items', { count: 3 });
 t('cart.summary', { itemsCount: 3, discountCount: 1 });
 ```
+
+## 13. Per-Route Dictionary Scoping
+
+The library may ship, on each request, only the translation keys statically referenced by the active route. Consumers opt in by installing the bundled Vite plugin. Without the plugin, every request ships the full dictionary for the active locale plus its fallback chain — behavior is unchanged.
+
+### Requirements
+
+- The library must expose a Vite plugin via the `./vite` subpath export.
+- The plugin must statically scan each SvelteKit route — `+page.svelte` plus its transitive imports and layouts — for literal `t('...')` calls at build/dev time.
+- The plugin must produce a per-route manifest keyed by `event.route.id`, mapping each route to the set of dotted keys referenced from that route's component tree.
+- Installing the plugin must not require additional wiring in `hooks.server.ts`. The consumer's `createI18nHandle()` call with no arguments must automatically pick up the manifest.
+- Consumers must be able to override or supply their own manifest by passing `keyManifest` to `createI18nHandle()`.
+- When a manifest is available, the server handle must prune `event.locals.i18n.dictionaries` to only the keys the active route statically references.
+- Pruning must be fallback-aware: each locale in the fallback chain must ship only the keys its descendant locale is missing. When the active locale is complete for a route, its ancestor locales must ship as empty subsets.
+- Unknown routes — those not present in the manifest (for example, 404 error pages) — must ship the full dictionaries. The library must never refuse to render a route because its keys were not enumerated at build time.
+- Only literal-string first arguments to `t()` are discoverable. Dynamic keys (`t(someVar)`) are invisible to the scanner; the library must not error on their presence, but such keys may not appear in the shipped subset.
+
+### Consumer Setup Example
+
+```ts
+// vite.config.ts
+import { sveltekit } from '@sveltejs/kit/vite';
+import { svelteI18n } from '@plcharriere/svelte-i18n/vite';
+
+export default {
+  plugins: [svelteI18n(), sveltekit()]
+};
+```
+
+```ts
+// src/hooks.server.ts
+import './i18n';
+import { createI18nHandle } from '@plcharriere/svelte-i18n/server';
+
+export const handle = createI18nHandle();
+```
+
+### Fallback Chain Examples
+
+**Two-hop chain** (active `fr`, chain `fr → en`) on route `/cart`:
+
+- `fr` has every `cart.*`, `nav.*`, and `common.*` key the route needs:
+  - `fr` must ship the full route subset: `{ cart: {...}, nav: {...}, common: {...} }`.
+  - `en` must ship `{}` — `fr` already provided everything.
+- If `fr` is missing one key (say `cart.empty`):
+  - `fr` ships every other key.
+  - `en` ships only `{ cart: { empty } }`.
+
+**Three-hop chain** (active `pt-BR`, chain `pt-BR → pt → en`) on route `/cart`:
+
+- `pt-BR` has `cart.title` and `cart.items` only; `pt` has the rest of `cart.*` plus `nav.*` and `common.*`; `en` is the canonical reference:
+  - `pt-BR` must ship `{ cart: { title, items } }` — its overrides.
+  - `pt` must ship every remaining key the route needs: `{ cart: { empty, summary, ... }, nav: {...}, common: {...} }`.
+  - `en` must ship `{}` — everything has been claimed by the time its turn arrives.
+- If `pt-BR` and `pt` combined leave a gap, only those leftover keys ship from `en`.
+
+## 14. Developer-Mode Hot Swap
+
+The Vite plugin, when installed, must provide a developer-mode hot-swap path for locale file edits.
+
+### Requirements
+
+- When a file under the locale source directory is modified, the plugin must invalidate the library's server-side dictionary cache for the affected locale.
+- The plugin must deliver the freshly loaded locale dictionary to the browser through a Vite HMR custom event.
+- The browser must apply the new dictionary in place and re-run every reactive `t()` call without a full page reload.
+- Browser state — scroll position, JavaScript state, form inputs — must be preserved across the swap.
+- The plugin must suppress Vite's default full-reload fallback for locale files so that the custom in-place swap runs instead.
+- If a locale file is deleted or fails to re-load, the plugin must not emit a malformed event that leaves the client cache in a silently stale state.

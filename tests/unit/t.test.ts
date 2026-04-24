@@ -6,7 +6,7 @@ import {
 	primeDictionary
 } from '../../src/lib/dictionary.ts';
 import { clearIcuCache } from '../../src/lib/icu.ts';
-import { t } from '../../src/lib/t.ts';
+import { t } from '../../src/lib/t.svelte.ts';
 
 // End-to-end tests through the public `t()` entry point. These drive the full
 // stack: active-locale accessor → dictionary lookup → fallback chain → ICU

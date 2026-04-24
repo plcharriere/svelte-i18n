@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { t } from '../../i18n';
 
-	let { product }: { product: { name: string; price: number; inStock: boolean } } = $props();
+	let {
+		product,
+		onAdd
+	}: {
+		product: { name: string; price: number; inStock: boolean };
+		onAdd: (name: string) => void;
+	} = $props();
 
 	// CORRECT — `$derived` wraps the `t()` call in a reactive getter; each
 	// read re-runs when the active locale `$state` changes.
@@ -13,7 +19,7 @@
 	<p class="price">{priceLabel}</p>
 	{#if product.inStock}
 		<!-- Inline template calls are also reactive — no `$derived` needed. -->
-		<button type="button">{t('reactivity.addToCart')}</button>
+		<button type="button" onclick={() => onAdd(product.name)}>{t('reactivity.addToCart')}</button>
 	{:else}
 		<span class="oos">{t('reactivity.outOfStock')}</span>
 	{/if}

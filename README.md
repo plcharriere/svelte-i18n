@@ -1,6 +1,6 @@
 # svelte-i18n
 
-Typed, ICU-aware i18n for **SvelteKit 2 + Svelte 5**. Path / cookie / domain routing, SSR-safe, full types inferred from your locale files — no codegen.
+Typed, ICU-aware, SSR-safe i18n for **SvelteKit 2 + Svelte 5** with per-route scoping.
 
 ```ts
 t('cart.items', { count: 2 });   // ✅ typed from the schema
@@ -147,13 +147,15 @@ Done. `/` renders English, `/fr` renders French, `setLocale('fr')` client-naviga
 
 ## Features
 
-- **Typed keys + params**, merged across every locale. No codegen, no `declare global`.
+- **Typed keys + params**, merged across every locale.
 - **Three routing modes** — `path` / `cookie` / `domain`.
 - **Locale variants** — `en-GB → en → default`, partial dictionaries supported.
 - **Full ICU** — plural, select, selectordinal, number / date / currency formats via `intl-messageformat`.
-- **SSR isolation** — per-request via `AsyncLocalStorage`.
+- **Per-route dictionary scoping** — optional Vite plugin ships only the keys each page actually uses. Landing visitors don't download admin strings. No namespaces, no opt-in lists.
+- **SSR-safe** — concurrent requests can't leak locales into each other.
 - **SEO** — canonical + hreflang + x-default, one URL per page.
-- **`<html lang dir>`** — patched server-side, kept in sync on the client.
+- **`<html lang dir>`** tracks the active locale, on the server and client.
+- **Hot-swap locales in dev** — edit a string in `fr.ts` and every visible translation updates in place. No reload, no state loss.
 
 ## API
 
@@ -168,7 +170,9 @@ Done. `/` renders English, `/fr` renders French, `setLocale('fr')` client-naviga
 | `<I18n />` | Mount once in root layout. |
 | `schema()` / `typed<T>()` | Locale-file authoring. |
 
-Server entry (`@plcharriere/svelte-i18n/server`): `createI18nHandle()`, `createI18nReroute()`, `getRequestLocale(event)`.
+Server entry (`@plcharriere/svelte-i18n/server`): `createI18nHandle({ keyManifest? })`, `createI18nReroute()`, `getRequestLocale(event)`.
+
+Vite entry (`@plcharriere/svelte-i18n/vite`): `svelteI18n()` — see [Per-route scoping](#per-route-scoping).
 
 ## Routing modes
 
@@ -186,7 +190,7 @@ The locale is the first URL segment: `/en/about`, `/fr/about`. The default langu
 URLs stay the same across locales (`/about`). The active locale is read from a cookie (`locale` by default), with `?lang=xx` as a one-shot override that also writes the cookie.
 
 - **Best for:** apps where URL stability matters (auth flows, shared links, deep-linked state) and SEO per-language isn't a priority.
-- **Switching:** `setLocale('fr')` writes the cookie and calls `invalidateAll()` so server loads re-run in the new locale.
+- **Switching:** `setLocale('fr')` writes the cookie and re-runs server loads in the new locale.
 
 ### `domain`
 
@@ -210,6 +214,30 @@ createI18n({
 });
 ```
 
+## Per-route scoping
+
+By default every request ships the full dictionary for the active locale plus its fallback chain. For a marketing + app + admin codebase that's wasteful — visitors to `/` don't need the admin strings, and ungated copy shouldn't leak via view-source.
+
+Opt into per-route pruning by adding the Vite plugin:
+
+```ts
+// vite.config.ts
+import { sveltekit } from '@sveltejs/kit/vite';
+import { svelteI18n } from '@plcharriere/svelte-i18n/vite';
+
+export default {
+  plugins: [svelteI18n(), sveltekit()]
+};
+```
+
+That's it. Your existing `hooks.server.ts` stays exactly as it was — `createI18nHandle()` with no arguments picks up the per-route manifest automatically.
+
+**What you get:** `/cart` only ships `cart.*`, `nav.*`, `common.*`, `profile.*`. Zero bytes from `admin`, `home`, `seo`, etc.
+
+**Limitations:** dynamic keys (`t(someVar)`) can't be discovered. Reference them as literals somewhere on the route — e.g. `t('errors.generic')` — to force them into the shipped set, or accept they'll resolve from the fallback chain instead.
+
+**Dev HMR:** edit a locale file and translations swap in place. No reload, no state loss.
+
 ## Gotcha: reactivity
 
 `t()` is reactive only if you don't capture it.
@@ -228,6 +256,8 @@ createI18n({
 <!-- ✅ inline is already reactive -->
 <button>{t('cart.addToCart')}</button>
 ```
+
+Svelte 5 flags the broken pattern with a `state_referenced_locally` warning. Listen to it: wrap in `$derived` or call `t()` inline in the template.
 
 ## Details
 
