@@ -50,7 +50,7 @@ export default schema({
 // src/i18n.ts
 import { createI18n } from '@plcharriere/svelte-i18n';
 
-export const { t } = createI18n({
+export const t = createI18n({
   mode: 'path',
   defaultLanguage: 'en',
   seo: true,
@@ -80,7 +80,7 @@ export const { t } = createI18n({
 });
 ```
 
-Only `t` is returned from `createI18n()` — it's the one function typed against your schema. Everything else (`setLocale`, `getCurrentLocale`, `getLocales`, `getSeoLinks`) is schema-agnostic and imported directly from the package.
+`createI18n()` returns `t` — the one function typed against your schema. Everything else (`setLocale`, `getCurrentLocale`, `getLocales`, `getSeoLinks`) is schema-agnostic and imported directly from the package.
 
 ### 3. Wire SvelteKit
 
@@ -138,8 +138,8 @@ export const load = ({ locals, url }) => ({
 
 <a href="/">{t('nav.home')}</a>
 
-{#each getLocales() as loc (loc.code)}
-  <button onclick={() => setLocale(loc.code)}>{loc.nativeLabel}</button>
+{#each getLocales() as locale (locale.code)}
+  <button onclick={() => setLocale(locale.code)}>{locale.nativeLabel}</button>
 {/each}
 ```
 
@@ -161,7 +161,7 @@ Done. `/` renders English, `/fr` renders French, `setLocale('fr')` client-naviga
 
 | Export | Purpose |
 | --- | --- |
-| `createI18n(config)` | Setup. Returns `{ t }`. |
+| `createI18n(config)` | Setup. Returns the typed `t`. |
 | `t(key, params?)` | Typed translator. |
 | `setLocale(code)` | Switch locale, per-mode side effects. |
 | `getCurrentLocale()` | Active locale metadata. |

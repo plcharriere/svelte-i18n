@@ -51,15 +51,15 @@
 <p class="muted">{t('reactivity.explain')}</p>
 
 <div class="switcher" role="group" aria-label="Locale">
-	{#each locales as loc (loc.code)}
+	{#each locales as locale (locale.code)}
 		<button
 			type="button"
 			class="pill"
-			class:active={active === loc.code}
-			aria-pressed={active === loc.code}
-			onclick={() => setLocale(loc.code)}
+			class:active={active === locale.code}
+			aria-pressed={active === locale.code}
+			onclick={() => setLocale(locale.code)}
 		>
-			{loc.nativeLabel ?? loc.code}
+			{locale.nativeLabel ?? locale.code}
 		</button>
 	{/each}
 </div>

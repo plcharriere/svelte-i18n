@@ -8,16 +8,15 @@ import type {
 	TypedKey
 } from './types.ts';
 
-export type I18nInstance<S = undefined> = {
-	t: <K extends TypedKey<S>>(key: K, ...args: TypedArgs<S, K>) => string;
-};
+export type TypedT<S = undefined> = <K extends TypedKey<S>>(
+	key: K,
+	...args: TypedArgs<S, K>
+) => string;
 
 export function createI18n<L extends LanguagesMap>(
 	config: I18nConfig<L>
-): I18nInstance<SchemaFromLanguages<L>> {
+): TypedT<SchemaFromLanguages<L>> {
 	const resolved = normalizeConfig(config);
 	setCurrentConfig(resolved);
-	return {
-		t: rawT as I18nInstance<SchemaFromLanguages<L>>['t']
-	};
+	return rawT as TypedT<SchemaFromLanguages<L>>;
 }

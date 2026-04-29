@@ -33,20 +33,36 @@
 			<a href="/seo" class:active={isActive('/seo')} aria-current={isActive('/seo') ? 'page' : undefined}>{t('nav.seo')}</a>
 			<a href="/inspect" class:active={isActive('/inspect')} aria-current={isActive('/inspect') ? 'page' : undefined}>{t('nav.inspect')}</a>
 		</nav>
-		<label class="locale-select">
-			<span class="sr">{t('common.language')}</span>
-			<select
-				value={current}
-				onchange={(e) =>
-					setLocale((e.currentTarget as HTMLSelectElement).value)}
+		<div class="header-right">
+			<label class="locale-select">
+				<span class="sr">{t('common.language')}</span>
+				<select
+					value={current}
+					onchange={(e) =>
+						setLocale((e.currentTarget as HTMLSelectElement).value)}
+				>
+					{#each locales as locale (locale.code)}
+						<option value={locale.code}>
+							{locale.nativeLabel ?? locale.code}
+						</option>
+					{/each}
+				</select>
+			</label>
+			<a
+				class="gh-link"
+				href="https://github.com/plcharriere/svelte-i18n"
+				target="_blank"
+				rel="noopener noreferrer"
+				aria-label="GitHub"
 			>
-				{#each locales as loc (loc.code)}
-					<option value={loc.code}>
-						{loc.nativeLabel ?? loc.code}
-					</option>
-				{/each}
-			</select>
-		</label>
+				<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+					<path
+						fill="currentColor"
+						d="M12 .5C5.73.5.75 5.48.75 11.75c0 4.95 3.21 9.14 7.66 10.62.56.1.76-.24.76-.54 0-.27-.01-1.16-.02-2.1-3.12.68-3.78-1.32-3.78-1.32-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.69.08-.69 1.13.08 1.72 1.16 1.72 1.16 1 1.72 2.63 1.22 3.27.93.1-.72.39-1.22.71-1.5-2.49-.28-5.11-1.25-5.11-5.55 0-1.23.44-2.23 1.16-3.02-.12-.28-.5-1.43.11-2.97 0 0 .94-.3 3.09 1.15.9-.25 1.87-.38 2.83-.38s1.93.13 2.83.38c2.15-1.45 3.09-1.15 3.09-1.15.61 1.54.23 2.69.11 2.97.72.79 1.16 1.79 1.16 3.02 0 4.31-2.62 5.27-5.12 5.55.4.34.76 1.02.76 2.06 0 1.49-.01 2.69-.01 3.05 0 .3.2.65.77.54 4.45-1.48 7.65-5.67 7.65-10.62C23.25 5.48 18.27.5 12 .5Z"
+					/>
+				</svg>
+			</a>
+		</div>
 	</div>
 </header>
 
@@ -165,6 +181,27 @@
 		padding: 0.3rem 0.5rem;
 		cursor: pointer;
 	}
+	.header-right {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+	}
+	.gh-link {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--muted);
+		padding: 0.4rem;
+		border-radius: 8px;
+		transition:
+			color 0.15s ease,
+			background 0.15s ease;
+	}
+	.gh-link:hover {
+		color: var(--fg);
+		background: var(--subtle);
+		text-decoration: none;
+	}
 	.sr {
 		position: absolute;
 		width: 1px;
@@ -186,7 +223,7 @@
 			gap: 0.75rem;
 		}
 		.brand { grid-area: brand; }
-		.locale-select { grid-area: locale; }
+		.header-right { grid-area: locale; }
 		.site-nav {
 			grid-area: nav;
 			justify-self: stretch;

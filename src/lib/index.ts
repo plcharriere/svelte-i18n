@@ -1,4 +1,4 @@
-export { createI18n, type I18nInstance } from './create.ts';
+export { createI18n, type TypedT } from './create.ts';
 export { schema, typed } from './schema.ts';
 export { setLocale, getCurrentLocale, getLocales } from './locale.ts';
 export { getSeoLinks, type SeoContext } from './seo.ts';

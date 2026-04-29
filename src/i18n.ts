@@ -1,6 +1,6 @@
 import { createI18n } from "$lib";
 
-export const { t } = createI18n({
+export const t = createI18n({
   mode: "path",
   defaultLanguage: "en",
   seo: true,

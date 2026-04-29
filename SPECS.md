@@ -798,7 +798,7 @@ schema-agnostic and is imported directly from `@plcharriere/svelte-i18n`.
 // src/i18n.ts
 import { createI18n } from '@plcharriere/svelte-i18n';
 
-export const { t } = createI18n({
+export const t = createI18n({
   mode: 'path',
   defaultLanguage: 'en',
   languages: {
