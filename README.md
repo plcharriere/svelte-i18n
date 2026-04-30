@@ -191,6 +191,7 @@ URLs stay the same across locales (`/about`). The active locale is read from a c
 
 - **Best for:** apps where URL stability matters (auth flows, shared links, deep-linked state) and SEO per-language isn't a priority.
 - **Switching:** `setLocale('fr')` writes the cookie and re-runs server loads in the new locale.
+- **Cross-tab sync:** when a tab calls `setLocale`, every other tab on the same origin updates automatically via `BroadcastChannel`. Toggle with `syncTabs: false`; rename the channel with `syncChannel: 'my-app'` if you need to isolate from another app sharing the origin.
 
 ### `domain`
 
@@ -210,7 +211,11 @@ createI18n({
   strict: false,             // throw instead of warn on missing keys / params
   cookieName: 'locale',      // cookie mode only
   domainFallback: 'default', // 'default' | 'reject' (domain mode)
-  seo: false                 // enable getSeoLinks() output
+  seo: false,                // enable getSeoLinks() output
+
+  // cookie mode only — cross-tab locale sync via BroadcastChannel
+  syncTabs: true,            // disable with `false`
+  syncChannel: 'svelte-i18n' // override if multiple apps share the origin
 });
 ```
 

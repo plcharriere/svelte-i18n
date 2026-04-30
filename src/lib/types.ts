@@ -48,6 +48,17 @@ export type I18nConfig<L extends LanguagesMap = LanguagesMap> = {
 	 * tags for you.
 	 */
 	seo?: boolean;
+	/**
+	 * Cross-tab locale sync via `BroadcastChannel`. Cookie mode only —
+	 * ignored in path/domain modes. Defaults to `true`.
+	 */
+	syncTabs?: boolean;
+	/**
+	 * `BroadcastChannel` name used when `syncTabs` is enabled. Defaults to
+	 * `'svelte-i18n'`. Override if you have multiple apps on the same origin
+	 * that should not share the channel.
+	 */
+	syncChannel?: string;
 };
 
 export type ResolvedI18nConfig = {
@@ -60,6 +71,8 @@ export type ResolvedI18nConfig = {
 	cookieName: string;
 	domainFallback: 'default' | 'reject';
 	seo: boolean;
+	syncTabs: boolean;
+	syncChannel: string;
 };
 
 export type SeoLinks = {

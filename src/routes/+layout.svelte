@@ -9,9 +9,9 @@
 	const locales = getLocales();
 	const current = $derived(getCurrentLocale().code);
 
-	const activeRoute = $derived(page.route.id ?? '/');
+	const activeRoute = $derived(page.route.id);
 	function isActive(href: string) {
-		return href === '/' ? activeRoute === '/' : activeRoute === href;
+		return activeRoute === href;
 	}
 </script>
 

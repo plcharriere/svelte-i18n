@@ -42,7 +42,8 @@ export function createI18nHandle(options: I18nHandleOptions = {}): Handle {
 			event.cookies.set(config.cookieName, resolution.persistCookie, {
 				path: '/',
 				maxAge: 60 * 60 * 24 * 365,
-				sameSite: 'lax'
+				sameSite: 'lax',
+				httpOnly: false
 			});
 		}
 

@@ -1,3 +1,4 @@
+import { getCookieBroadcastChannel } from './broadcast.ts';
 import { getCurrentConfig } from './config.ts';
 import { getI18nContext } from './context.svelte.ts';
 import { suspendInterception } from './intercept.ts';
@@ -69,6 +70,7 @@ export async function setLocale(code: LanguageCode): Promise<void> {
 		)}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
 		const ctx = getI18nContext();
 		if (ctx) ctx.code = code;
+		getCookieBroadcastChannel()?.postMessage(code);
 
 		const url = new URL(window.location.href);
 		if (url.searchParams.has('lang')) {

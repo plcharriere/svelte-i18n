@@ -1,5 +1,6 @@
-import { beforeNavigate, goto } from '$app/navigation';
+import { beforeNavigate, goto, invalidateAll } from '$app/navigation';
 import { setClientLocaleAccessor } from './active-locale.ts';
+import { getCookieBroadcastChannel } from './broadcast.ts';
 import { primeDictionary } from './dictionary.ts';
 import { extractPathLocale } from './path-locale.ts';
 import { peekCurrentConfig } from './config.ts';
@@ -102,6 +103,20 @@ export function createI18nContext(
 		const target = `${prefix}${nav.to.url.pathname}${nav.to.url.search}${nav.to.url.hash}`;
 		goto(target, { replaceState: false });
 	});
+
+	const channel = getCookieBroadcastChannel();
+	if (channel) {
+		const onMessage = (e: MessageEvent) => {
+			const config = peekCurrentConfig();
+			if (!config || config.mode !== 'cookie') return;
+			if (typeof e.data !== 'string') return;
+			if (!config.languages[e.data]) return;
+			if (e.data === code) return;
+			invalidateAll();
+		};
+		channel.addEventListener('message', onMessage);
+		$effect(() => () => channel.removeEventListener('message', onMessage));
+	}
 
 	return store;
 }

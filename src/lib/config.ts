@@ -69,7 +69,9 @@ export function normalizeConfig<L extends LanguagesMap>(
 		strict: !!config.strict,
 		cookieName: config.cookieName ?? 'locale',
 		domainFallback: config.domainFallback ?? 'default',
-		seo: config.seo ?? false
+		seo: config.seo ?? false,
+		syncTabs: config.syncTabs ?? true,
+		syncChannel: config.syncChannel ?? 'svelte-i18n'
 	};
 }
 

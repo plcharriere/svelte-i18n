@@ -1,6 +1,6 @@
 {
 	"name": "@plcharriere/svelte-i18n",
-	"version": "0.2.3",
+	"version": "0.2.4",
 	"description": "Typed, ICU-aware, SSR-safe i18n for SvelteKit 2 + Svelte 5 with per-route scoping.",
 	"keywords": [
 		"svelte",
