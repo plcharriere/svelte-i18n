@@ -6,12 +6,23 @@ import { setLoadingLocale } from './loading.svelte.ts';
 import { extractPathLocale } from './path-locale.ts';
 import { getActiveLocale } from './active-locale.ts';
 import { warn } from './warnings.ts';
-import type { LanguageCode, LocaleInfo } from './types.ts';
+import type { LocaleCode, LocaleInfo } from './types.ts';
 
 export function getCurrentLocale(): LocaleInfo {
 	const config = getCurrentConfig();
-	const code = getActiveLocale() ?? config.defaultLanguage;
-	const def = config.languages[code] ?? config.languages[config.defaultLanguage];
+	const code = getActiveLocale() ?? config.defaultLocale;
+	const def = config.locales[code] ?? config.locales[config.defaultLocale];
+	return {
+		code: def.code,
+		label: def.label,
+		nativeLabel: def.nativeLabel,
+		rtl: def.rtl
+	};
+}
+
+export function getDefaultLocale(): LocaleInfo {
+	const config = getCurrentConfig();
+	const def = config.locales[config.defaultLocale];
 	return {
 		code: def.code,
 		label: def.label,
@@ -23,7 +34,7 @@ export function getCurrentLocale(): LocaleInfo {
 export function getLocales(): LocaleInfo[] {
 	const config = getCurrentConfig();
 	return config.codes.map((code) => {
-		const def = config.languages[code];
+		const def = config.locales[code];
 		return {
 			code: def.code,
 			label: def.label,
@@ -37,9 +48,9 @@ async function kit() {
 	return await import('$app/navigation');
 }
 
-export async function setLocale(code: LanguageCode): Promise<void> {
+export async function setLocale(code: LocaleCode): Promise<void> {
 	const config = getCurrentConfig();
-	if (!config.languages[code]) {
+	if (!config.locales[code]) {
 		warn('unknown-locale', `setLocale called with unknown code "${code}".`);
 		return;
 	}
@@ -51,7 +62,7 @@ export async function setLocale(code: LanguageCode): Promise<void> {
 			const { goto } = await kit();
 			const current = window.location.pathname;
 			const { rest } = extractPathLocale(current, config);
-			const prefix = code === config.defaultLanguage ? '' : `/${code}`;
+			const prefix = code === config.defaultLocale ? '' : `/${code}`;
 			const target =
 				`${prefix}${rest}${window.location.search}${window.location.hash}` || '/';
 			const release = suspendInterception();
@@ -97,7 +108,7 @@ export async function setLocale(code: LanguageCode): Promise<void> {
 	}
 
 	if (config.mode === 'domain') {
-		const def = config.languages[code];
+		const def = config.locales[code];
 		if (!def.domains || def.domains.length === 0) {
 			warn(
 				'no-domain-mapping',

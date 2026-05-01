@@ -1,7 +1,7 @@
-import type { LanguageCode } from './types.ts';
+import type { LocaleCode } from './types.ts';
 
 export type RequestI18nState = {
-	locale: LanguageCode;
+	locale: LocaleCode;
 };
 
 type Storage = {
@@ -24,6 +24,6 @@ export function runWithI18n<T>(state: RequestI18nState, fn: () => T): T {
 	return storage ? storage.run(state, fn) : fn();
 }
 
-export function getServerLocale(): LanguageCode | undefined {
+export function getServerLocale(): LocaleCode | undefined {
 	return storage?.getStore()?.locale;
 }

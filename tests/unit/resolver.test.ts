@@ -11,8 +11,8 @@ import {
 
 const pathConfig = normalizeConfig({
 	mode: 'path',
-	defaultLanguage: 'en',
-	languages: {
+	defaultLocale: 'en',
+	locales: {
 		en: {},
 		fr: {},
 		'en-GB': { parent: 'en' },
@@ -109,8 +109,8 @@ describe('resolvePathLocale', () => {
 describe('resolveDomainLocale', () => {
 	const domainConfig = normalizeConfig({
 		mode: 'domain',
-		defaultLanguage: 'en',
-		languages: {
+		defaultLocale: 'en',
+		locales: {
 			en: { domains: ['example.com', 'en.example.com'] },
 			fr: { domains: ['example.fr'] }
 		}
@@ -146,8 +146,8 @@ function mockEvent({
 describe('resolveCookieLocale', () => {
 	const cookieConfig = normalizeConfig({
 		mode: 'cookie',
-		defaultLanguage: 'en',
-		languages: { en: {}, fr: {}, pt: {} }
+		defaultLocale: 'en',
+		locales: { en: {}, fr: {}, pt: {} }
 	});
 
 	it('returns the default when nothing is set', () => {
@@ -199,8 +199,8 @@ describe('resolveActiveLocale', () => {
 	it('dispatches to cookie mode with persist flag', () => {
 		const cookieConfig = normalizeConfig({
 			mode: 'cookie',
-			defaultLanguage: 'en',
-			languages: { en: {}, fr: {} }
+			defaultLocale: 'en',
+			locales: { en: {}, fr: {} }
 		});
 		const res = resolveActiveLocale(
 			mockEvent({ search: '?lang=fr' }),
@@ -212,9 +212,9 @@ describe('resolveActiveLocale', () => {
 	it('dispatches to domain mode and flags rejected on unknown host', () => {
 		const strictDomain = normalizeConfig({
 			mode: 'domain',
-			defaultLanguage: 'en',
+			defaultLocale: 'en',
 			domainFallback: 'reject',
-			languages: { en: { domains: ['example.com'] } }
+			locales: { en: { domains: ['example.com'] } }
 		});
 		const res = resolveActiveLocale(
 			{ url: new URL('https://other.com/') } as RequestEvent,
@@ -226,8 +226,8 @@ describe('resolveActiveLocale', () => {
 	it('domain mode with fallback=default returns default without rejecting', () => {
 		const lenientDomain = normalizeConfig({
 			mode: 'domain',
-			defaultLanguage: 'en',
-			languages: { en: { domains: ['example.com'] } }
+			defaultLocale: 'en',
+			locales: { en: { domains: ['example.com'] } }
 		});
 		const res = resolveActiveLocale(
 			{ url: new URL('https://other.com/') } as RequestEvent,

@@ -11,8 +11,8 @@ describe('warn()', () => {
 		setCurrentConfig(
 			normalizeConfig({
 				mode: 'path',
-				defaultLanguage: 'en',
-				languages: { en: {} }
+				defaultLocale: 'en',
+				locales: { en: {} }
 			})
 		);
 		const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -27,9 +27,9 @@ describe('warn()', () => {
 		setCurrentConfig(
 			normalizeConfig({
 				mode: 'path',
-				defaultLanguage: 'en',
+				defaultLocale: 'en',
 				strict: true,
-				languages: { en: {} }
+				locales: { en: {} }
 			})
 		);
 		const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -48,8 +48,8 @@ describe('warn()', () => {
 		setCurrentConfig(
 			normalizeConfig({
 				mode: 'path',
-				defaultLanguage: 'en',
-				languages: { en: {} }
+				defaultLocale: 'en',
+				locales: { en: {} }
 			})
 		);
 		const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});

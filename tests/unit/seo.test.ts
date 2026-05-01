@@ -8,8 +8,8 @@ describe('getSeoLinks', () => {
 			normalizeConfig({
 				mode: 'path',
 				seo: true,
-				defaultLanguage: 'en',
-				languages: { en: {}, fr: {}, 'en-GB': { parent: 'en' } }
+				defaultLocale: 'en',
+				locales: { en: {}, fr: {}, 'en-GB': { parent: 'en' } }
 			})
 		);
 		const seo = getSeoLinks({
@@ -31,8 +31,8 @@ describe('getSeoLinks', () => {
 			normalizeConfig({
 				mode: 'cookie',
 				seo: true,
-				defaultLanguage: 'en',
-				languages: { en: {}, fr: {}, 'en-GB': { parent: 'en' } }
+				defaultLocale: 'en',
+				locales: { en: {}, fr: {}, 'en-GB': { parent: 'en' } }
 			})
 		);
 		const seo = getSeoLinks({
@@ -53,8 +53,8 @@ describe('getSeoLinks', () => {
 			normalizeConfig({
 				mode: 'domain',
 				seo: true,
-				defaultLanguage: 'en',
-				languages: {
+				defaultLocale: 'en',
+				locales: {
 					en: { domains: ['example.com'] },
 					fr: { domains: ['example.fr'] }
 				}
@@ -79,8 +79,9 @@ describe('getSeoLinks', () => {
 		setCurrentConfig(
 			normalizeConfig({
 				mode: 'path',
-				defaultLanguage: 'en',
-				languages: { en: {}, fr: {} }
+				defaultLocale: 'en',
+				locales: { en: {}, fr: {} },
+				seo: false
 			})
 		);
 		expect(

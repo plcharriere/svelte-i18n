@@ -1,29 +1,29 @@
 import { fallbackChain } from './config.ts';
 import type {
 	Dictionary,
-	LanguageCode,
+	LocaleCode,
 	ResolvedI18nConfig
 } from './types.ts';
 import { warn } from './warnings.ts';
 
-type FlatEntry = { locale: LanguageCode; message: string };
+type FlatEntry = { locale: LocaleCode; message: string };
 
-const cache: Map<LanguageCode, Dictionary> = new Map();
-const pending: Map<LanguageCode, Promise<Dictionary>> = new Map();
-const flatCache: Map<LanguageCode, Map<string, FlatEntry>> = new Map();
+const cache: Map<LocaleCode, Dictionary> = new Map();
+const pending: Map<LocaleCode, Promise<Dictionary>> = new Map();
+const flatCache: Map<LocaleCode, Map<string, FlatEntry>> = new Map();
 
-export function primeDictionary(code: LanguageCode, dict: Dictionary): void {
+export function primeDictionary(code: LocaleCode, dict: Dictionary): void {
 	if (cache.get(code) === dict) return;
 	cache.set(code, dict);
 	flatCache.clear();
 }
 
-export function getCachedDictionary(code: LanguageCode): Dictionary | undefined {
+export function getCachedDictionary(code: LocaleCode): Dictionary | undefined {
 	return cache.get(code);
 }
 
 export async function loadDictionary(
-	code: LanguageCode,
+	code: LocaleCode,
 	config: ResolvedI18nConfig
 ): Promise<Dictionary | undefined> {
 	const existing = cache.get(code);
@@ -54,7 +54,7 @@ export async function loadDictionary(
 }
 
 export async function loadChain(
-	code: LanguageCode,
+	code: LocaleCode,
 	config: ResolvedI18nConfig
 ): Promise<void> {
 	const chain = fallbackChain(code, config);
@@ -64,7 +64,7 @@ export async function loadChain(
 function flattenInto(
 	dict: Dictionary,
 	prefix: string,
-	locale: LanguageCode,
+	locale: LocaleCode,
 	out: Map<string, FlatEntry>
 ): void {
 	for (const key of Object.keys(dict)) {
@@ -79,7 +79,7 @@ function flattenInto(
 }
 
 function getFlatView(
-	locale: LanguageCode,
+	locale: LocaleCode,
 	config: ResolvedI18nConfig
 ): Map<string, FlatEntry> {
 	let flat = flatCache.get(locale);
@@ -99,7 +99,7 @@ const warnedMissing = new Set<string>();
 
 export function resolveMessage(
 	key: string,
-	locale: LanguageCode,
+	locale: LocaleCode,
 	config: ResolvedI18nConfig
 ): FlatEntry | undefined {
 	const entry = getFlatView(locale, config).get(key);
@@ -112,15 +112,15 @@ export function resolveMessage(
 		return undefined;
 	}
 	if (
-		entry.locale === config.defaultLanguage &&
-		locale !== config.defaultLanguage
+		entry.locale === config.defaultLocale &&
+		locale !== config.defaultLocale
 	) {
 		const warnKey = `${locale}::${key}`;
 		if (!warnedFallback.has(warnKey)) {
 			warnedFallback.add(warnKey);
 			warn(
 				'fallback-to-default',
-				`Key "${key}" missing from "${locale}"; used default "${config.defaultLanguage}".`
+				`Key "${key}" missing from "${locale}"; used default "${config.defaultLocale}".`
 			);
 		}
 	}

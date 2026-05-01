@@ -1,6 +1,6 @@
 export { createI18n, type TypedT } from './create.ts';
 export { schema, typed } from './schema.ts';
-export { setLocale, getCurrentLocale, getLocales } from './locale.ts';
+export { setLocale, getCurrentLocale, getDefaultLocale, getLocales } from './locale.ts';
 export { isLoadingLocale, getLoadingLocale } from './loading.svelte.ts';
 export { getSeoLinks, type SeoContext } from './seo.ts';
 export {
@@ -17,10 +17,10 @@ export {
 } from './dictionary.ts';
 export type {
 	I18nConfig,
-	LanguageCode,
-	LanguageDefinition,
+	LocaleCode,
+	LocaleDefinition,
 	ResolvedI18nConfig,
-	ResolvedLanguageDefinition,
+	ResolvedLocaleDefinition,
 	LocaleInfo,
 	LocaleLoader,
 	LocaleLoaderMap,
@@ -31,8 +31,8 @@ export type {
 	TypedKey,
 	TypedArgs,
 	TypedMessageBrand,
-	SchemaFromLanguages,
-	LanguagesMap,
+	SchemaFromLocales,
+	LocalesMap,
 	Leaves,
 	ValueAt
 } from './types.ts';

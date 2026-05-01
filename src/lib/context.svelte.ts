@@ -9,16 +9,16 @@ import { bumpTranslationRevision } from './t.svelte.ts';
 import type {
 	Dictionary,
 	I18nPageData,
-	LanguageCode,
+	LocaleCode,
 	ResolvedI18nConfig
 } from './types.ts';
 
 export type I18nContext = {
-	get code(): LanguageCode;
-	set code(value: LanguageCode);
+	get code(): LocaleCode;
+	set code(value: LocaleCode);
 };
 
-let code = $state<LanguageCode | undefined>(undefined);
+let code = $state<LocaleCode | undefined>(undefined);
 
 if (typeof window !== 'undefined') {
 	setClientLocaleAccessor(() => code);
@@ -26,7 +26,7 @@ if (typeof window !== 'undefined') {
 	if (import.meta.hot) {
 		import.meta.hot.on('svelte-i18n:locale-changed', (payload: unknown) => {
 			const { code: c, dict } = (payload ?? {}) as {
-				code?: LanguageCode;
+				code?: LocaleCode;
 				dict?: Dictionary;
 			};
 			if (!c || !dict) return;
@@ -38,7 +38,7 @@ if (typeof window !== 'undefined') {
 
 const store: I18nContext = {
 	get code() {
-		const c = code ?? peekCurrentConfig()?.defaultLanguage;
+		const c = code ?? peekCurrentConfig()?.defaultLocale;
 		if (!c) {
 			throw new Error(
 				'[svelte-i18n] Active locale requested before createI18n() was called.'
@@ -46,7 +46,7 @@ const store: I18nContext = {
 		}
 		return c;
 	},
-	set code(value: LanguageCode) {
+	set code(value: LocaleCode) {
 		code = value;
 	}
 };
@@ -96,7 +96,7 @@ export function createI18nContext(
 		if (urlCode) return;
 
 		const active = store.code;
-		if (active === config.defaultLanguage) return;
+		if (active === config.defaultLocale) return;
 
 		nav.cancel();
 		const prefix = `/${active}`;
@@ -110,7 +110,7 @@ export function createI18nContext(
 			const config = peekCurrentConfig();
 			if (!config || config.mode !== 'cookie') return;
 			if (typeof e.data !== 'string') return;
-			if (!config.languages[e.data]) return;
+			if (!config.locales[e.data]) return;
 			if (e.data === code) return;
 			invalidateAll();
 		};
@@ -127,10 +127,10 @@ export function getI18nContext(): I18nContext | undefined {
 }
 
 function rewriteAnchors(
-	current: LanguageCode,
+	current: LocaleCode,
 	config: ResolvedI18nConfig
 ): void {
-	const prefix = current === config.defaultLanguage ? '' : `/${current}`;
+	const prefix = current === config.defaultLocale ? '' : `/${current}`;
 	const anchors = document.querySelectorAll<HTMLAnchorElement>('a[href]');
 	for (const a of anchors) rewriteAnchor(a, prefix, config);
 }

@@ -27,8 +27,8 @@ beforeEach(() => {
 	setCurrentConfig(
 		normalizeConfig({
 			mode: 'path',
-			defaultLanguage: 'en',
-			languages: {
+			defaultLocale: 'en',
+			locales: {
 				en: {},
 				fr: {},
 				'en-GB': { parent: 'en' },

@@ -14,6 +14,7 @@
 
 <svelte:head>
 	<link rel="icon" href="/favicon.svg" />
+	<meta name="description" content={t('home.tagline')} />
 </svelte:head>
 
 <I18n />

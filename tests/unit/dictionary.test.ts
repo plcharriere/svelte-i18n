@@ -8,8 +8,8 @@ import {
 
 const config = normalizeConfig({
 	mode: 'path',
-	defaultLanguage: 'en',
-	languages: {
+	defaultLocale: 'en',
+	locales: {
 		en: {},
 		'en-GB': { parent: 'en' },
 		pt: {},

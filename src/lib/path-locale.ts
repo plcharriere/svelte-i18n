@@ -1,4 +1,4 @@
-import type { LanguageCode, ResolvedI18nConfig } from './types.ts';
+import type { LocaleCode, ResolvedI18nConfig } from './types.ts';
 
 const LANG_SEGMENT_RE =
 	/^([A-Za-z]{2,3}(?:-[A-Za-z]{4})?(?:-(?:[A-Za-z]{2}|\d{3}))?)(?=\/|$)/;
@@ -6,7 +6,7 @@ const LANG_SEGMENT_RE =
 export function extractPathLocale(
 	pathname: string,
 	config: ResolvedI18nConfig
-): { code: LanguageCode | undefined; rest: string } {
+): { code: LocaleCode | undefined; rest: string } {
 	const trimmed = pathname.replace(/^\/+/, '');
 	const match = trimmed.match(LANG_SEGMENT_RE);
 	if (!match) return { code: undefined, rest: pathname };
@@ -20,8 +20,8 @@ export function extractPathLocale(
 function findCode(
 	candidate: string,
 	config: ResolvedI18nConfig
-): LanguageCode | undefined {
-	if (config.languages[candidate]) return candidate;
+): LocaleCode | undefined {
+	if (config.locales[candidate]) return candidate;
 	const lower = candidate.toLowerCase();
 	for (const code of config.codes) {
 		if (code.toLowerCase() === lower) return code;

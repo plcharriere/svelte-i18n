@@ -15,7 +15,7 @@ export function t(
 ): string {
 	revision;
 	const config = getCurrentConfig();
-	const locale = getActiveLocale() ?? config.defaultLanguage;
+	const locale = getActiveLocale() ?? config.defaultLocale;
 	const resolved = resolveMessage(key, locale, config);
 	if (!resolved) return '';
 	return formatMessage(resolved.locale, resolved.message, params, { key });

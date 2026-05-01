@@ -20,8 +20,8 @@ describe('loadDictionary', () => {
 		const loader = vi.fn(async () => ({ default: { a: 'A' } }));
 		const config = normalizeConfig({
 			mode: 'path',
-			defaultLanguage: 'en',
-			languages: { en: { load: loader } }
+			defaultLocale: 'en',
+			locales: { en: { load: loader } }
 		});
 		const first = await loadDictionary('en', config);
 		expect(first).toEqual({ a: 'A' });
@@ -43,8 +43,8 @@ describe('loadDictionary', () => {
 		);
 		const config = normalizeConfig({
 			mode: 'path',
-			defaultLanguage: 'en',
-			languages: { en: { load: loader } }
+			defaultLocale: 'en',
+			locales: { en: { load: loader } }
 		});
 		const p1 = loadDictionary('en', config);
 		const p2 = loadDictionary('en', config);
@@ -58,8 +58,8 @@ describe('loadDictionary', () => {
 		const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 		const config = normalizeConfig({
 			mode: 'path',
-			defaultLanguage: 'en',
-			languages: { en: {} } // no load
+			defaultLocale: 'en',
+			locales: { en: {} } // no load
 		});
 		const res = await loadDictionary('en', config);
 		expect(res).toBeUndefined();
@@ -71,8 +71,8 @@ describe('loadDictionary', () => {
 	it('unwraps module.default or uses the module directly', async () => {
 		const configA = normalizeConfig({
 			mode: 'path',
-			defaultLanguage: 'en',
-			languages: {
+			defaultLocale: 'en',
+			locales: {
 				en: { load: async () => ({ default: { wrapped: 'yes' } }) }
 			}
 		});
@@ -82,8 +82,8 @@ describe('loadDictionary', () => {
 
 		const configB = normalizeConfig({
 			mode: 'path',
-			defaultLanguage: 'en',
-			languages: {
+			defaultLocale: 'en',
+			locales: {
 				en: { load: async () => ({ bare: 'yes' }) }
 			}
 		});
@@ -100,8 +100,8 @@ describe('loadChain', () => {
 		};
 		const config = normalizeConfig({
 			mode: 'path',
-			defaultLanguage: 'en',
-			languages: {
+			defaultLocale: 'en',
+			locales: {
 				en: { load: loaders.en },
 				pt: { load: loaders.pt },
 				'pt-BR': { parent: 'pt', load: loaders['pt-BR'] }

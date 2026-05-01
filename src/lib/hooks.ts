@@ -10,7 +10,7 @@ import { getServerLocale, runWithI18n } from './ssr-store.ts';
 import type {
 	Dictionary,
 	I18nPageData,
-	LanguageCode,
+	LocaleCode,
 	ResolvedI18nConfig
 } from './types.ts';
 
@@ -49,9 +49,9 @@ export function createI18nHandle(options: I18nHandleOptions = {}): Handle {
 
 		await loadChain(resolution.code, config);
 
-		const rtl = config.languages[resolution.code]?.rtl ?? false;
+		const rtl = config.locales[resolution.code]?.rtl ?? false;
 		const chain = fallbackChain(resolution.code, config);
-		const dictionaries: Record<LanguageCode, Dictionary> = {};
+		const dictionaries: Record<LocaleCode, Dictionary> = {};
 		for (const code of chain) {
 			const dict = getCachedDictionary(code);
 			if (dict) dictionaries[code] = dict;
@@ -86,7 +86,7 @@ export function createI18nHandle(options: I18nHandleOptions = {}): Handle {
 					});
 					if (
 						config.mode === 'path' &&
-						resolution.code !== config.defaultLanguage
+						resolution.code !== config.defaultLocale
 					) {
 						out = rewriteAnchors(out, resolution.code, config);
 					}
@@ -101,7 +101,7 @@ const HREF_RE = /\shref=(["'])(\/[^"']*)\1/g;
 
 function rewriteAnchors(
 	html: string,
-	code: LanguageCode,
+	code: LocaleCode,
 	config: ResolvedI18nConfig
 ): string {
 	const prefix = `/${code}`;

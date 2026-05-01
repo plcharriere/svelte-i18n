@@ -2,47 +2,47 @@ import { describe, expect, it } from 'vitest';
 import { fallbackChain, normalizeConfig } from '../../src/lib/config.ts';
 
 describe('normalizeConfig', () => {
-	it('defaults defaultLanguage to en when supported', () => {
+	it('defaults defaultLocale to en when supported', () => {
 		const resolved = normalizeConfig({
 			mode: 'path',
-			languages: { en: { label: 'English' }, fr: { label: 'French' } }
+			locales: { en: { label: 'English' }, fr: { label: 'French' } }
 		});
-		expect(resolved.defaultLanguage).toBe('en');
+		expect(resolved.defaultLocale).toBe('en');
 	});
 
-	it('rejects a defaultLanguage that is not in languages', () => {
+	it('rejects a defaultLocale that is not in locales', () => {
 		expect(() =>
 			normalizeConfig({
 				mode: 'path',
-				defaultLanguage: 'de',
-				languages: { en: {} }
+				defaultLocale: 'de',
+				locales: { en: {} }
 			})
-		).toThrow(/defaultLanguage/);
+		).toThrow(/defaultLocale/);
 	});
 
 	it('inherits metadata from parent when missing', () => {
 		const resolved = normalizeConfig({
 			mode: 'path',
-			defaultLanguage: 'en',
-			languages: {
+			defaultLocale: 'en',
+			locales: {
 				en: { label: 'English', nativeLabel: 'English' },
 				'en-GB': { parent: 'en', label: 'English (UK)' },
 				ar: { label: 'Arabic', nativeLabel: 'Arabic', rtl: true },
 				'ar-AE': { parent: 'ar', label: 'Arabic (AE)' }
 			}
 		});
-		expect(resolved.languages['en-GB'].nativeLabel).toBe('English');
-		expect(resolved.languages['en-GB'].rtl).toBe(false);
-		expect(resolved.languages['ar-AE'].nativeLabel).toBe('Arabic');
-		expect(resolved.languages['ar-AE'].rtl).toBe(true);
+		expect(resolved.locales['en-GB'].nativeLabel).toBe('English');
+		expect(resolved.locales['en-GB'].rtl).toBe(false);
+		expect(resolved.locales['ar-AE'].nativeLabel).toBe('Arabic');
+		expect(resolved.locales['ar-AE'].rtl).toBe(true);
 	});
 
 	it('rtl defaults to false', () => {
 		const resolved = normalizeConfig({
 			mode: 'path',
-			languages: { en: {} }
+			locales: { en: {} }
 		});
-		expect(resolved.languages.en.rtl).toBe(false);
+		expect(resolved.locales.en.rtl).toBe(false);
 	});
 });
 
@@ -50,8 +50,8 @@ describe('fallbackChain', () => {
 	it('walks parent links to the default', () => {
 		const resolved = normalizeConfig({
 			mode: 'path',
-			defaultLanguage: 'en',
-			languages: {
+			defaultLocale: 'en',
+			locales: {
 				en: {},
 				pt: {},
 				'pt-BR': { parent: 'pt' }
@@ -65,8 +65,8 @@ describe('fallbackChain', () => {
 	it('avoids duplicate default entries when chain already ends on default', () => {
 		const resolved = normalizeConfig({
 			mode: 'path',
-			defaultLanguage: 'en',
-			languages: { en: {}, 'en-GB': { parent: 'en' } }
+			defaultLocale: 'en',
+			locales: { en: {}, 'en-GB': { parent: 'en' } }
 		});
 		expect(fallbackChain('en-GB', resolved)).toEqual(['en-GB', 'en']);
 	});

@@ -52,9 +52,8 @@ import { createI18n } from '@plcharriere/svelte-i18n';
 
 export const t = createI18n({
   mode: 'path',
-  defaultLanguage: 'en',
-  seo: true,
-  languages: {
+  defaultLocale: 'en',
+  locales: {
     en: {
       label: 'English',
       nativeLabel: 'English',
@@ -80,7 +79,7 @@ export const t = createI18n({
 });
 ```
 
-`createI18n()` returns `t` — the one function typed against your schema. Everything else (`setLocale`, `getCurrentLocale`, `getLocales`, `isLoadingLocale`, `getLoadingLocale`, `getSeoLinks`) is schema-agnostic and imported directly from the package.
+`createI18n()` returns `t` — the one function typed against your schema. Everything else (`setLocale`, `getCurrentLocale`, `getDefaultLocale`, `getLocales`, `isLoadingLocale`, `getLoadingLocale`, `getSeoLinks`) is schema-agnostic and imported directly from the package.
 
 ### 3. Wire SvelteKit
 
@@ -165,10 +164,11 @@ Done. `/` renders English, `/fr` renders French, `setLocale('fr')` client-naviga
 | `t(key, params?)` | Typed translator. |
 | `setLocale(code)` | Switch locale, per-mode side effects. |
 | `getCurrentLocale()` | Active locale metadata. |
+| `getDefaultLocale()` | Default locale metadata (the one configured via `defaultLocale`). |
 | `getLocales()` | All configured locales. |
 | `isLoadingLocale(code?)` | Reactive: `true` while a `setLocale` is in flight. With `code`, only `true` while switching to that specific locale. |
 | `getLoadingLocale()` | Reactive: the locale currently being switched to, or `undefined`. |
-| `getSeoLinks(ctx?)` | Canonical / alternates / xDefault. Opt in via `seo: true`. |
+| `getSeoLinks(ctx?)` | Canonical / alternates / xDefault. On by default; pass `seo: false` to disable. |
 | `<I18n />` | Mount once in root layout. |
 | `schema()` / `typed<T>()` | Locale-file authoring. |
 
@@ -207,14 +207,14 @@ The locale is picked by `event.url.host`. Each language declares one or more `do
 
 ```ts
 createI18n({
-  mode: 'path',              // 'path' | 'cookie' | 'domain'
-  defaultLanguage: 'en',
-  languages: { ... },
+  mode: 'path',              // 'path' | 'cookie' | 'domain' (defaults to 'path')
+  defaultLocale: 'en',
+  locales: { ... },
 
   strict: false,             // throw instead of warn on missing keys / params
   cookieName: 'locale',      // cookie mode only
   domainFallback: 'default', // 'default' | 'reject' (domain mode)
-  seo: false,                // enable getSeoLinks() output
+  seo: true,                 // pass `false` to suppress getSeoLinks() output
 
   // cookie mode only — cross-tab locale sync via BroadcastChannel
   syncTabs: true,            // disable with `false`

@@ -40,7 +40,7 @@ Examples:
 ### Type Shape
 
 ```ts
-type LanguageCode = string;
+type LocaleCode = string;
 ```
 
 ### Runtime Configuration Example
@@ -48,8 +48,8 @@ type LanguageCode = string;
 ```ts
 createI18n({
   mode: 'domain',
-  defaultLanguage: 'en',
-  languages: {
+  defaultLocale: 'en',
+  locales: {
     en: {
       label: 'English',
       nativeLabel: 'English',
@@ -78,7 +78,7 @@ createI18n({
 ### Language Definition Example
 
 ```ts
-type LanguageDefinition = {
+type LocaleDefinition = {
   label?: string;
   nativeLabel?: string;
   rtl?: boolean;
@@ -102,7 +102,7 @@ If a locale definition declares a `parent`, missing metadata fields must inherit
 Example:
 
 ```ts
-languages: {
+locales: {
   ar: {
     label: 'Arabic',
     nativeLabel: 'Arabic',
@@ -141,8 +141,8 @@ The default language is `en`.
 ```ts
 createI18n({
   mode: 'path',
-  languages: ['fr', 'en', 'pt', 'es'],
-  defaultLanguage: 'en'
+  locales: ['fr', 'en', 'pt', 'es'],
+  defaultLocale: 'en'
 });
 ```
 
@@ -218,8 +218,8 @@ Example metadata:
 ```ts
 createI18n({
   mode: 'domain',
-  defaultLanguage: 'en',
-  languages: {
+  defaultLocale: 'en',
+  locales: {
     en: {
       label: 'English',
       nativeLabel: 'English',
@@ -240,7 +240,7 @@ Path mode, cookie mode, and domain mode should be treated as distinct configurat
 
 ### Additional Configuration Options
 
-`createI18n()` must accept the following optional top-level options beyond `mode`, `defaultLanguage`, and `languages`:
+`createI18n()` must accept the following optional top-level options beyond `mode`, `defaultLocale`, and `languages`:
 
 - `strict?: boolean` — when `true`, validation events (missing keys, missing params, dotted schema keys, fallback-to-default, unknown locales) throw instead of emitting `console.warn`. Defaults to `false`.
 - `cookieName?: string` — name of the locale cookie used in `cookie` mode. Defaults to `'locale'`.
@@ -276,10 +276,10 @@ Examples:
 For active locale `en-GB`, translation lookup resolves in this order:
 
 ```ts
-'en-GB' -> 'en' -> defaultLanguage
+'en-GB' -> 'en' -> defaultLocale
 ```
 
-If `defaultLanguage` is `en`, the practical chain is:
+If `defaultLocale` is `en`, the practical chain is:
 
 ```ts
 'en-GB' -> 'en'
@@ -800,8 +800,8 @@ import { createI18n } from '@plcharriere/svelte-i18n';
 
 export const t = createI18n({
   mode: 'path',
-  defaultLanguage: 'en',
-  languages: {
+  defaultLocale: 'en',
+  locales: {
     en:      { label: 'English',                          load: () => import('./locales/en') },
     'en-GB': { parent: 'en', label: 'English (UK)',       load: () => import('./locales/en-GB') },
     fr:      { label: 'French',  nativeLabel: 'Français', load: () => import('./locales/fr') },

@@ -1,16 +1,16 @@
-import type { LanguageCode } from './types.ts';
+import type { LocaleCode } from './types.ts';
 
-let loadingLocale = $state<LanguageCode | undefined>(undefined);
+let loadingLocale = $state<LocaleCode | undefined>(undefined);
 
-export function setLoadingLocale(code: LanguageCode | undefined): void {
+export function setLoadingLocale(code: LocaleCode | undefined): void {
 	loadingLocale = code;
 }
 
-export function isLoadingLocale(code?: LanguageCode): boolean {
+export function isLoadingLocale(code?: LocaleCode): boolean {
 	if (code === undefined) return loadingLocale !== undefined;
 	return loadingLocale === code;
 }
 
-export function getLoadingLocale(): LanguageCode | undefined {
+export function getLoadingLocale(): LocaleCode | undefined {
 	return loadingLocale;
 }

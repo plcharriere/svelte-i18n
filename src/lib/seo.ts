@@ -18,7 +18,7 @@ export function getSeoLinks(context?: SeoContext): SeoLinks | undefined {
 				(typeof window !== 'undefined' ? window.location.href : 'http://localhost/')
 	);
 	const activeLocale =
-		context?.locale ?? getActiveLocale() ?? config.defaultLanguage;
+		context?.locale ?? getActiveLocale() ?? config.defaultLocale;
 
 	const canonicalPath = stripLocaleFromPath(url.pathname, config);
 
@@ -31,7 +31,7 @@ export function getSeoLinks(context?: SeoContext): SeoLinks | undefined {
 	const xDefault = buildLocaleHref(
 		url,
 		canonicalPath,
-		config.defaultLanguage,
+		config.defaultLocale,
 		config
 	);
 
@@ -53,7 +53,7 @@ function buildLocaleHref(
 	code: string,
 	config: ReturnType<typeof getCurrentConfig>
 ): string {
-	const isDefault = code === config.defaultLanguage;
+	const isDefault = code === config.defaultLocale;
 	if (config.mode === 'path') {
 		const prefix = isDefault ? '' : `/${code}`;
 		const pathPart = canonicalPath === '/' ? '' : canonicalPath;
@@ -76,7 +76,7 @@ function buildLocaleHref(
 		target.search = qs ? `?${qs}` : '';
 		return target.toString();
 	}
-	const def = config.languages[code];
+	const def = config.locales[code];
 	const host = def?.domains?.[0];
 	if (!host) return url.toString();
 	const target = new URL(url);

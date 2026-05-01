@@ -1,11 +1,11 @@
-import type { Dictionary, LanguageCode } from './types.ts';
+import type { Dictionary, LocaleCode } from './types.ts';
 
 export function pruneDicts(
-	chain: LanguageCode[],
-	dicts: Record<LanguageCode, Dictionary>,
+	chain: LocaleCode[],
+	dicts: Record<LocaleCode, Dictionary>,
 	keys: string[]
-): Record<LanguageCode, Dictionary> {
-	const out: Record<LanguageCode, Dictionary> = {};
+): Record<LocaleCode, Dictionary> {
+	const out: Record<LocaleCode, Dictionary> = {};
 	const claimed = new Set<string>();
 	for (const code of chain) {
 		const dict = dicts[code];

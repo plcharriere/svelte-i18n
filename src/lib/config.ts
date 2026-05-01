@@ -1,19 +1,19 @@
 import type {
 	I18nConfig,
-	LanguageCode,
-	LanguageDefinition,
-	LanguagesMap,
+	LocaleCode,
+	LocaleDefinition,
+	LocalesMap,
 	LocaleLoaderMap,
 	ResolvedI18nConfig,
-	ResolvedLanguageDefinition
+	ResolvedLocaleDefinition
 } from './types.ts';
-const DEFAULT_LANGUAGE_FALLBACK = 'en';
+const DEFAULT_LOCALE_FALLBACK = 'en';
 
 function inheritField<T>(
-	code: LanguageCode,
-	field: keyof LanguageDefinition,
-	raw: Record<LanguageCode, LanguageDefinition>,
-	visiting: Set<LanguageCode> = new Set()
+	code: LocaleCode,
+	field: keyof LocaleDefinition,
+	raw: Record<LocaleCode, LocaleDefinition>,
+	visiting: Set<LocaleCode> = new Set()
 ): T | undefined {
 	if (visiting.has(code)) return undefined;
 	visiting.add(code);
@@ -25,70 +25,70 @@ function inheritField<T>(
 	return undefined;
 }
 
-export function normalizeConfig<L extends LanguagesMap>(
+export function normalizeConfig<L extends LocalesMap>(
 	config: I18nConfig<L>
 ): ResolvedI18nConfig {
-	const defaultLanguage =
-		config.defaultLanguage ?? DEFAULT_LANGUAGE_FALLBACK;
+	const defaultLocale =
+		config.defaultLocale ?? DEFAULT_LOCALE_FALLBACK;
 
-	if (!config.languages[defaultLanguage]) {
+	if (!config.locales[defaultLocale]) {
 		throw new Error(
-			`[svelte-i18n] defaultLanguage "${defaultLanguage}" is not declared in languages.`
+			`[svelte-i18n] defaultLocale "${defaultLocale}" is not declared in locales.`
 		);
 	}
 
-	const languages: Record<LanguageCode, ResolvedLanguageDefinition> = {};
+	const locales: Record<LocaleCode, ResolvedLocaleDefinition> = {};
 	const loaders: LocaleLoaderMap = {};
-	for (const code of Object.keys(config.languages)) {
-		const def = config.languages[code];
-		languages[code] = {
+	for (const code of Object.keys(config.locales)) {
+		const def = config.locales[code];
+		locales[code] = {
 			code,
-			label: def.label ?? inheritField<string>(code, 'label', config.languages),
+			label: def.label ?? inheritField<string>(code, 'label', config.locales),
 			nativeLabel:
 				def.nativeLabel ??
-				inheritField<string>(code, 'nativeLabel', config.languages),
+				inheritField<string>(code, 'nativeLabel', config.locales),
 			rtl:
 				def.rtl ??
-				inheritField<boolean>(code, 'rtl', config.languages) ??
+				inheritField<boolean>(code, 'rtl', config.locales) ??
 				false,
 			parent: def.parent,
 			domains:
 				def.domains ??
-				inheritField<string[]>(code, 'domains', config.languages) ??
+				inheritField<string[]>(code, 'domains', config.locales) ??
 				[]
 		};
 		if (def.load) loaders[code] = def.load;
 	}
 
 	return {
-		mode: config.mode,
-		defaultLanguage,
-		languages,
-		codes: Object.keys(languages),
+		mode: config.mode ?? 'path',
+		defaultLocale,
+		locales,
+		codes: Object.keys(locales),
 		loaders,
 		strict: !!config.strict,
 		cookieName: config.cookieName ?? 'locale',
 		domainFallback: config.domainFallback ?? 'default',
-		seo: config.seo ?? false,
+		seo: config.seo ?? true,
 		syncTabs: config.syncTabs ?? true,
 		syncChannel: config.syncChannel ?? 'svelte-i18n'
 	};
 }
 
 export function fallbackChain(
-	code: LanguageCode,
+	code: LocaleCode,
 	config: ResolvedI18nConfig
-): LanguageCode[] {
-	const chain: LanguageCode[] = [];
-	const seen = new Set<LanguageCode>();
-	let current: LanguageCode | undefined = code;
+): LocaleCode[] {
+	const chain: LocaleCode[] = [];
+	const seen = new Set<LocaleCode>();
+	let current: LocaleCode | undefined = code;
 	while (current && !seen.has(current)) {
 		seen.add(current);
 		chain.push(current);
-		current = config.languages[current]?.parent;
+		current = config.locales[current]?.parent;
 	}
-	if (!seen.has(config.defaultLanguage)) {
-		chain.push(config.defaultLanguage);
+	if (!seen.has(config.defaultLocale)) {
+		chain.push(config.defaultLocale);
 	}
 	return chain;
 }

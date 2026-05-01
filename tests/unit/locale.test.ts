@@ -30,8 +30,8 @@ describe('setLocale()', () => {
 		setCurrentConfig(
 			normalizeConfig({
 				mode: 'path',
-				defaultLanguage: 'en',
-				languages: { en: {}, fr: {} }
+				defaultLocale: 'en',
+				locales: { en: {}, fr: {} }
 			})
 		);
 		const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -45,8 +45,8 @@ describe('setLocale()', () => {
 		setCurrentConfig(
 			normalizeConfig({
 				mode: 'domain',
-				defaultLanguage: 'en',
-				languages: {
+				defaultLocale: 'en',
+				locales: {
 					en: { domains: ['example.com'] },
 					// fr is configured but has no domain — setLocale('fr') is a no-op.
 					fr: {}

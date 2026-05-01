@@ -1,27 +1,27 @@
-export type LanguageCode = string;
+export type LocaleCode = string;
 
 export type RoutingMode = 'path' | 'cookie' | 'domain';
 
-export type LanguageDefinition = {
+export type LocaleDefinition = {
 	label?: string;
 	nativeLabel?: string;
 	rtl?: boolean;
-	parent?: LanguageCode;
+	parent?: LocaleCode;
 	domains?: string[];
 	load?: LocaleLoader;
 };
 
-export type ResolvedLanguageDefinition = {
-	code: LanguageCode;
+export type ResolvedLocaleDefinition = {
+	code: LocaleCode;
 	label?: string;
 	nativeLabel?: string;
 	rtl: boolean;
-	parent?: LanguageCode;
+	parent?: LocaleCode;
 	domains: string[];
 };
 
 export type LocaleInfo = {
-	code: LanguageCode;
+	code: LocaleCode;
 	label?: string;
 	nativeLabel?: string;
 	rtl: boolean;
@@ -33,19 +33,22 @@ export type LocaleLoaderMap = Record<string, LocaleLoader>;
 
 export type Dictionary = { [key: string]: Dictionary | string };
 
-export type LanguagesMap = Record<LanguageCode, LanguageDefinition>;
+export type LocalesMap = Record<LocaleCode, LocaleDefinition>;
 
-export type I18nConfig<L extends LanguagesMap = LanguagesMap> = {
-	mode: RoutingMode;
-	defaultLanguage?: LanguageCode;
-	languages: L;
+export type I18nConfig<L extends LocalesMap = LocalesMap> = {
+	/**
+	 * How the active locale is resolved per request. Defaults to `'path'`.
+	 */
+	mode?: RoutingMode;
+	defaultLocale?: LocaleCode;
+	locales: L;
 	strict?: boolean;
 	cookieName?: string;
 	domainFallback?: 'default' | 'reject';
 	/**
 	 * Emit `<link rel="canonical">` + hreflang alternates from `<I18n />`.
-	 * Defaults to `false` — opt in when you want the library to manage SEO
-	 * tags for you.
+	 * Defaults to `true`. Pass `false` to suppress the library's SEO output
+	 * (e.g. when another tool manages canonical / hreflang tags).
 	 */
 	seo?: boolean;
 	/**
@@ -63,9 +66,9 @@ export type I18nConfig<L extends LanguagesMap = LanguagesMap> = {
 
 export type ResolvedI18nConfig = {
 	mode: RoutingMode;
-	defaultLanguage: LanguageCode;
-	languages: Record<LanguageCode, ResolvedLanguageDefinition>;
-	codes: LanguageCode[];
+	defaultLocale: LocaleCode;
+	locales: Record<LocaleCode, ResolvedLocaleDefinition>;
+	codes: LocaleCode[];
 	loaders: LocaleLoaderMap;
 	strict: boolean;
 	cookieName: string;
@@ -82,9 +85,9 @@ export type SeoLinks = {
 };
 
 export type I18nPageData = {
-	locale: LanguageCode;
+	locale: LocaleCode;
 	rtl?: boolean;
-	dictionaries?: Record<LanguageCode, Dictionary>;
+	dictionaries?: Record<LocaleCode, Dictionary>;
 	seo?: SeoLinks;
 };
 
@@ -99,7 +102,7 @@ type UnionToIntersection<U> = (
 	? I
 	: never;
 
-type SchemaLeaves<L extends LanguagesMap> = {
+type SchemaLeaves<L extends LocalesMap> = {
 	[K in keyof L]: L[K] extends { load: () => Promise<infer M> }
 		? M extends { default: infer D }
 			? D
@@ -107,7 +110,7 @@ type SchemaLeaves<L extends LanguagesMap> = {
 		: never;
 }[keyof L];
 
-export type SchemaFromLanguages<L extends LanguagesMap> = [
+export type SchemaFromLocales<L extends LocalesMap> = [
 	SchemaLeaves<L>
 ] extends [never]
 	? undefined

@@ -1,7 +1,7 @@
 import type { RequestEvent, Reroute } from '@sveltejs/kit';
 import { getCurrentConfig } from './config.ts';
 import { extractPathLocale } from './path-locale.ts';
-import type { LanguageCode } from './types.ts';
+import type { LocaleCode } from './types.ts';
 
 export function createI18nReroute(): Reroute {
 	return ({ url }: { url: URL }) => {
@@ -13,6 +13,6 @@ export function createI18nReroute(): Reroute {
 	};
 }
 
-export function getRequestLocale(event: RequestEvent): LanguageCode {
-	return event.locals.i18n?.locale ?? getCurrentConfig().defaultLanguage;
+export function getRequestLocale(event: RequestEvent): LocaleCode {
+	return event.locals.i18n?.locale ?? getCurrentConfig().defaultLocale;
 }
