@@ -1,12 +1,9 @@
 <script lang="ts">
-	import { getCurrentLocale, getLocales, setLocale } from '$lib';
+	import LocaleSwitcher from '../../locale-switcher.svelte';
 	import { pageTitle } from '../../page-title';
 	import { t } from '../../i18n';
 	import BrokenCard from './BrokenCard.svelte';
 	import CorrectCard from './CorrectCard.svelte';
-
-	const locales = getLocales();
-	const active = $derived(getCurrentLocale().code);
 
 	const product = {
 		name: 'Widget 3000',
@@ -50,19 +47,7 @@
 <h1>{t('reactivity.heading')}</h1>
 <p class="muted">{t('reactivity.explain')}</p>
 
-<div class="switcher" role="group" aria-label="Locale">
-	{#each locales as locale (locale.code)}
-		<button
-			type="button"
-			class="pill"
-			class:active={active === locale.code}
-			aria-pressed={active === locale.code}
-			onclick={() => setLocale(locale.code)}
-		>
-			{locale.nativeLabel ?? locale.code}
-		</button>
-	{/each}
-</div>
+<LocaleSwitcher />
 
 <div class="grid grid-2">
 	<section class="card column broken-column">
@@ -114,31 +99,6 @@
 		color: var(--muted);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
-		font-weight: 600;
-	}
-	.switcher {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.4rem;
-		margin: 0 0 1.5rem;
-	}
-	.pill {
-		font: inherit;
-		font-size: 0.85rem;
-		padding: 0.35rem 0.75rem;
-		border: 1px solid var(--border);
-		background: var(--card);
-		color: var(--fg);
-		border-radius: 999px;
-		cursor: pointer;
-	}
-	.pill:hover {
-		border-color: var(--accent);
-	}
-	.pill.active {
-		background: var(--accent);
-		border-color: var(--accent);
-		color: #fff;
 		font-weight: 600;
 	}
 	.column pre {

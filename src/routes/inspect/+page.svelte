@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { getCurrentLocale } from '$lib';
 	import type { Dictionary, I18nPageData } from '$lib';
+	import LocaleSwitcher from '../../locale-switcher.svelte';
 	import { pageTitle } from '../../page-title';
 	import { t } from '../../i18n';
 
@@ -36,6 +37,8 @@
 
 <h1>{t('nav.inspect')}</h1>
 <p class="muted">{t('inspect.subtitle')}</p>
+
+<LocaleSwitcher />
 
 <section class="card">
 	<table class="kv">

@@ -1,13 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { I18n, getCurrentLocale, getLocales, setLocale } from '$lib';
+	import { I18n } from '$lib';
 	import { t } from '../i18n';
 	import type { Snippet } from 'svelte';
 
 	let { children }: { children: Snippet } = $props();
-
-	const locales = getLocales();
-	const current = $derived(getCurrentLocale().code);
 
 	const activeRoute = $derived(page.route.id);
 	function isActive(href: string) {
@@ -23,7 +20,7 @@
 
 <header class="site-header">
 	<div class="header-inner">
-		<a class="brand" href="/">svelte-i18n</a>
+		<a class="brand" href="/">@plcharriere/svelte-i18n</a>
 		<nav class="site-nav" aria-label="Main">
 			<a href="/" class:active={isActive('/')} aria-current={isActive('/') ? 'page' : undefined}>{t('nav.home')}</a>
 			<a href="/cart" class:active={isActive('/cart')} aria-current={isActive('/cart') ? 'page' : undefined}>{t('nav.cart')}</a>
@@ -33,23 +30,23 @@
 			<a href="/seo" class:active={isActive('/seo')} aria-current={isActive('/seo') ? 'page' : undefined}>{t('nav.seo')}</a>
 			<a href="/inspect" class:active={isActive('/inspect')} aria-current={isActive('/inspect') ? 'page' : undefined}>{t('nav.inspect')}</a>
 		</nav>
-		<div class="header-right">
-			<label class="locale-select">
-				<span class="sr">{t('common.language')}</span>
-				<select
-					value={current}
-					onchange={(e) =>
-						setLocale((e.currentTarget as HTMLSelectElement).value)}
-				>
-					{#each locales as locale (locale.code)}
-						<option value={locale.code}>
-							{locale.nativeLabel ?? locale.code}
-						</option>
-					{/each}
-				</select>
-			</label>
+		<div class="header-links">
 			<a
-				class="gh-link"
+				class="ext-link"
+				href="https://www.npmjs.com/package/@plcharriere/svelte-i18n"
+				target="_blank"
+				rel="noopener noreferrer"
+				aria-label="npm"
+			>
+				<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+					<path
+						fill="currentColor"
+						d="M0 7.334v8h6.666v1.332H12v-1.332h12v-8H0zm6.666 6.664H5.334v-4H3.999v4H1.335V8.667h5.331v5.331zm4 0v1.336H8.001V8.667h5.334v5.332h-2.669v-.001zm12.001 0h-1.33v-4h-1.336v4h-1.335v-4h-1.33v4h-2.671V8.667h8.002v5.331zM10.665 10H12v2.667h-1.335V10z"
+					/>
+				</svg>
+			</a>
+			<a
+				class="ext-link"
 				href="https://github.com/plcharriere/svelte-i18n"
 				target="_blank"
 				rel="noopener noreferrer"
@@ -69,10 +66,6 @@
 <main class="site-main">
 	{@render children()}
 </main>
-
-<footer class="site-footer">
-	<small>{t('common.footer', { year: new Date().getFullYear() })}</small>
-</footer>
 
 <style>
 	:global(:root) {
@@ -176,17 +169,12 @@
 		background: var(--subtle);
 		font-weight: 600;
 	}
-	.locale-select select {
-		font-size: 0.85rem;
-		padding: 0.3rem 0.5rem;
-		cursor: pointer;
-	}
-	.header-right {
-		display: flex;
+	.header-links {
+		display: inline-flex;
 		align-items: center;
-		gap: 0.6rem;
+		gap: 0.25rem;
 	}
-	.gh-link {
+	.ext-link {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -197,33 +185,21 @@
 			color 0.15s ease,
 			background 0.15s ease;
 	}
-	.gh-link:hover {
+	.ext-link:hover {
 		color: var(--fg);
 		background: var(--subtle);
 		text-decoration: none;
 	}
-	.sr {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		padding: 0;
-		margin: -1px;
-		overflow: hidden;
-		clip: rect(0, 0, 0, 0);
-		white-space: nowrap;
-		border: 0;
-	}
-
 	@media (max-width: 760px) {
 		.header-inner {
 			grid-template-columns: 1fr auto;
 			grid-template-areas:
-				'brand locale'
+				'brand links'
 				'nav nav';
 			gap: 0.75rem;
 		}
 		.brand { grid-area: brand; }
-		.header-right { grid-area: locale; }
+		.header-links { grid-area: links; }
 		.site-nav {
 			grid-area: nav;
 			justify-self: stretch;
@@ -235,17 +211,11 @@
 		.site-nav a { white-space: nowrap; }
 	}
 
+
 	.site-main {
 		max-width: 960px;
 		margin: 0 auto;
 		padding: 2rem 1.25rem 3rem;
-	}
-	.site-footer {
-		max-width: 960px;
-		margin: 0 auto;
-		padding: 1rem 1.25rem 2rem;
-		color: var(--muted);
-		border-top: 1px solid var(--border);
 	}
 
 	:global(.card) {

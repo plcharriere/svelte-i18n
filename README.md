@@ -80,7 +80,7 @@ export const t = createI18n({
 });
 ```
 
-`createI18n()` returns `t` — the one function typed against your schema. Everything else (`setLocale`, `getCurrentLocale`, `getLocales`, `getSeoLinks`) is schema-agnostic and imported directly from the package.
+`createI18n()` returns `t` — the one function typed against your schema. Everything else (`setLocale`, `getCurrentLocale`, `getLocales`, `isLoadingLocale`, `getLoadingLocale`, `getSeoLinks`) is schema-agnostic and imported directly from the package.
 
 ### 3. Wire SvelteKit
 
@@ -166,6 +166,8 @@ Done. `/` renders English, `/fr` renders French, `setLocale('fr')` client-naviga
 | `setLocale(code)` | Switch locale, per-mode side effects. |
 | `getCurrentLocale()` | Active locale metadata. |
 | `getLocales()` | All configured locales. |
+| `isLoadingLocale(code?)` | Reactive: `true` while a `setLocale` is in flight. With `code`, only `true` while switching to that specific locale. |
+| `getLoadingLocale()` | Reactive: the locale currently being switched to, or `undefined`. |
 | `getSeoLinks(ctx?)` | Canonical / alternates / xDefault. Opt in via `seo: true`. |
 | `<I18n />` | Mount once in root layout. |
 | `schema()` / `typed<T>()` | Locale-file authoring. |
@@ -184,6 +186,7 @@ The locale is the first URL segment: `/en/about`, `/fr/about`. The default langu
 
 - **Best for:** SEO-critical sites — each translation has a distinct, crawlable URL.
 - **Switching:** `setLocale('fr')` client-navigates to the equivalent `/fr/...` URL, no full reload.
+- **Internal links:** write `<a href="/about">` as-is. The library rewrites unprefixed internal hrefs to carry the active locale — both in the SSR HTML (so crawlers, hover previews, copy-link, and middle-click see `/fr/about`) and in the DOM after a client-side switch. Default-locale pages stay unprefixed.
 
 ### `cookie`
 

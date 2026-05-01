@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getCurrentLocale } from '$lib';
+	import LocaleSwitcher from '../locale-switcher.svelte';
 	import { t } from '../i18n';
 </script>
 
@@ -14,6 +15,8 @@
 		{t('home.active', { code: getCurrentLocale().code })}
 	</p>
 </section>
+
+<LocaleSwitcher />
 
 <section class="grid grid-2">
 	<a class="card feature" href="/cart">

@@ -1,6 +1,7 @@
 export { createI18n, type TypedT } from './create.ts';
 export { schema, typed } from './schema.ts';
 export { setLocale, getCurrentLocale, getLocales } from './locale.ts';
+export { isLoadingLocale, getLoadingLocale } from './loading.svelte.ts';
 export { getSeoLinks, type SeoContext } from './seo.ts';
 export {
 	createI18nContext,

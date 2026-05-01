@@ -2,7 +2,7 @@ import { schema, typed } from '$lib';
 
 export default schema({
 	home: {
-		title: 'svelte-i18n',
+		title: '@plcharriere/svelte-i18n',
 		tagline: 'i18n tipado e com ICU para SvelteKit 2 + Svelte 5.',
 		active: typed<{ code: string }>('Idioma ativo: {code}'),
 		features: {
@@ -35,8 +35,7 @@ export default schema({
 	common: {
 		hello: 'Olá',
 		colour: 'Cor',
-		language: 'Idioma',
-		footer: typed<{ year: number }>('demo svelte-i18n · {year}')
+		language: 'Idioma'
 	},
 	nav: {
 		home: 'Início',

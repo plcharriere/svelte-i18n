@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import LocaleSwitcher from '../../locale-switcher.svelte';
 	import { pageTitle } from '../../page-title';
 	import { t } from '../../i18n';
 
@@ -12,6 +13,8 @@
 
 <h1>{t('seo.title')}</h1>
 <p class="muted">{t('seo.subtitle')}</p>
+
+<LocaleSwitcher />
 
 {#if !seo}
 	<section class="card">

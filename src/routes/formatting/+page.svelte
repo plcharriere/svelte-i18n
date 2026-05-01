@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getCurrentLocale } from '$lib';
+	import LocaleSwitcher from '../../locale-switcher.svelte';
 	import { pageTitle } from '../../page-title';
 	import { t } from '../../i18n';
 
@@ -19,6 +20,8 @@
 
 <h1>{t('formatting.title')}</h1>
 <p class="muted">{t('formatting.subtitle')}</p>
+
+<LocaleSwitcher />
 
 <p class="meta">
 	<strong>{t('formatting.localeLabel')}:</strong>

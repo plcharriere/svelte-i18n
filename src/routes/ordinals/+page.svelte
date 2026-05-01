@@ -1,4 +1,5 @@
 <script lang="ts">
+	import LocaleSwitcher from '../../locale-switcher.svelte';
 	import { pageTitle } from '../../page-title';
 	import { t } from '../../i18n';
 
@@ -12,6 +13,8 @@
 
 <h1>{t('ordinals.title')}</h1>
 <p class="muted">{t('ordinals.subtitle')}</p>
+
+<LocaleSwitcher />
 
 <section class="card">
 	<h2>{t('ordinals.playground')}</h2>
