@@ -1,5 +1,5 @@
 <script lang="ts">
-	import LocaleSwitcher from '../../locale-switcher.svelte';
+	import LocaleSwitcher from '../../LocaleSwitcher.svelte';
 	import { pageTitle } from '../../page-title';
 	import { t } from '../../i18n';
 

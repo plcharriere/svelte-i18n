@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { getCurrentLocale } from '$lib';
 	import type { Dictionary, I18nPageData } from '$lib';
-	import LocaleSwitcher from '../../locale-switcher.svelte';
+	import LocaleSwitcher from '../../LocaleSwitcher.svelte';
 	import { pageTitle } from '../../page-title';
-	import { t } from '../../i18n';
+	import { getCurrentLocale, t } from '../../i18n';
 
 	function flatten(obj: Dictionary, prefix = ''): Array<{ key: string; value: string }> {
 		const out: Array<{ key: string; value: string }> = [];

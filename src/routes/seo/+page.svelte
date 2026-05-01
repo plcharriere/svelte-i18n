@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import LocaleSwitcher from '../../locale-switcher.svelte';
+	import LocaleSwitcher from '../../LocaleSwitcher.svelte';
 	import { pageTitle } from '../../page-title';
 	import { t } from '../../i18n';
 

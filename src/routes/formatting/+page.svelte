@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { getCurrentLocale } from '$lib';
-	import LocaleSwitcher from '../../locale-switcher.svelte';
+	import LocaleSwitcher from '../../LocaleSwitcher.svelte';
 	import { pageTitle } from '../../page-title';
-	import { t } from '../../i18n';
+	import { getCurrentLocale, t } from '../../i18n';
 
 	let now = $state(new Date());
 	let amount = $state(1234.5);

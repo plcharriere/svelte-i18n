@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { getCurrentLocale } from '$lib';
-	import LocaleSwitcher from '../locale-switcher.svelte';
-	import { t } from '../i18n';
+	import LocaleSwitcher from '../LocaleSwitcher.svelte';
+	import { getCurrentLocale, t } from '../i18n';
 </script>
 
 <svelte:head>

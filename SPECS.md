@@ -240,12 +240,14 @@ Path mode, cookie mode, and domain mode should be treated as distinct configurat
 
 ### Additional Configuration Options
 
-`createI18n()` must accept the following optional top-level options beyond `mode`, `defaultLocale`, and `languages`:
+`createI18n()` must accept the following optional top-level options beyond `mode`, `defaultLocale`, and `locales`:
 
 - `strict?: boolean` — when `true`, validation events (missing keys, missing params, dotted schema keys, fallback-to-default, unknown locales) throw instead of emitting `console.warn`. Defaults to `false`.
 - `cookieName?: string` — name of the locale cookie used in `cookie` mode. Defaults to `'locale'`.
 - `domainFallback?: 'default' | 'reject'` — behavior in `domain` mode when the request host matches no configured locale. `'default'` serves the default language; `'reject'` returns a 404. Defaults to `'default'`.
-- `seo?: boolean` — opt-in flag for the SEO helper defined in §12. When `false` (the default) `getSeoLinks()` returns `undefined` so callers can wire `seo: getSeoLinks(...)` unconditionally without emitting tags.
+- `seo?: boolean` — gate for the SEO helper defined in §12. When `false`, `getSeoLinks()` returns `undefined` so callers can wire `seo: getSeoLinks(...)` unconditionally without emitting tags. Defaults to `true`.
+- `syncTabs?: boolean` — cross-tab locale sync via `BroadcastChannel` in `cookie` mode. Defaults to `true`. No effect outside cookie mode.
+- `syncChannel?: string` — `BroadcastChannel` name used when `syncTabs` is enabled. Defaults to `'svelte-i18n'`.
 
 ## 4. Locale Variants and Inheritance
 
@@ -780,25 +782,36 @@ The library must support typed translation authoring through `schema()` and `typ
 
 ### Schema Registration
 
-- `createI18n()` must derive `t()`'s key and param typing automatically from the `languages` map passed to it.
-- Each language definition's `load` function must be a dynamic `import()` expression with a literal path so TypeScript can resolve the locale module's default-export type at the call site.
+- `createI18n()` must derive `t()`'s key and param typing automatically from the `locales` map passed to it.
+- Each locale definition's `load` function must be a dynamic `import()` expression with a literal path so TypeScript can resolve the locale module's default-export type at the call site.
 - The library must infer the merged schema from every `load` in the map by intersecting each loaded module's `default` export. No generic argument, tuple, barrel, or `declare global` block may be required of the user.
 - Typed keys and their combined param shapes must be derived from this inferred schema at compile time; no generated `.d.ts` file is required.
-- Adding a new locale must require exactly one additional entry in the `languages` map — metadata and loader together — and no edits elsewhere.
+- Adding a new locale must require exactly one additional entry in the `locales` map — metadata and loader together — and no edits elsewhere.
 - Runtime locale loading must use the same `load` functions; the library must not require a second parallel loader map.
 
 ### Registration Example
 
-Only `t` is returned from `createI18n()` — it is the single function whose
-signature is schema-typed by the merged `languages` map. Every other helper
-(`setLocale`, `getCurrentLocale`, `getLocales`, `getSeoLinks`) is
-schema-agnostic and is imported directly from `@plcharriere/svelte-i18n`.
+`createI18n()` returns the typed locale bundle — `t` plus the locale
+helpers (`setLocale`, `getCurrentLocale`, `getDefaultLocale`, `getLocales`,
+`isLoadingLocale`, `getLoadingLocale`) — all typed against the configured
+`locales` map. Each helper is also re-exported standalone from
+`@plcharriere/svelte-i18n` with loose `string` typing for callers that
+don't need strict locale-code checking. `getSeoLinks` is locale-agnostic
+and lives only on the package.
 
 ```ts
 // src/i18n.ts
 import { createI18n } from '@plcharriere/svelte-i18n';
 
-export const t = createI18n({
+export const {
+  t,
+  setLocale,
+  getCurrentLocale,
+  getDefaultLocale,
+  getLocales,
+  isLoadingLocale,
+  getLoadingLocale
+} = createI18n({
   mode: 'path',
   defaultLocale: 'en',
   locales: {

@@ -50,7 +50,15 @@ export default schema({
 // src/i18n.ts
 import { createI18n } from '@plcharriere/svelte-i18n';
 
-export const t = createI18n({
+export const {
+  t,
+  setLocale,
+  getCurrentLocale,
+  getDefaultLocale,
+  getLocales,
+  isLoadingLocale,
+  getLoadingLocale
+} = createI18n({
   mode: 'path',
   defaultLocale: 'en',
   locales: {
@@ -79,7 +87,19 @@ export const t = createI18n({
 });
 ```
 
-`createI18n()` returns `t` — the one function typed against your schema. Everything else (`setLocale`, `getCurrentLocale`, `getDefaultLocale`, `getLocales`, `isLoadingLocale`, `getLoadingLocale`, `getSeoLinks`) is schema-agnostic and imported directly from the package.
+`createI18n()` returns the typed locale bundle: `t` (typed against your schema), and `setLocale`, `getCurrentLocale`, `getDefaultLocale`, `getLocales`, `isLoadingLocale`, `getLoadingLocale` — all typed against the locale codes you configured. `getSeoLinks` is schema-agnostic and imported directly from the package.
+
+Each helper is also re-exported from `@plcharriere/svelte-i18n` directly with loose `string` typing — handy if you don't need strict type-checking on locale codes:
+
+```ts
+// Typed (recommended) — destructured from createI18n
+import { setLocale } from './i18n';
+setLocale('xx'); // ❌ TS error: not in your locales
+
+// Untyped (escape hatch)
+import { setLocale } from '@plcharriere/svelte-i18n';
+setLocale('xx'); // ✓ compiles; no-op + warn at runtime
+```
 
 ### 3. Wire SvelteKit
 
@@ -129,8 +149,8 @@ export const load = ({ locals, url }) => ({
 ```svelte
 <!-- src/routes/+layout.svelte -->
 <script>
-  import { I18n, setLocale, getLocales } from '@plcharriere/svelte-i18n';
-  import { t } from '../i18n';
+  import { I18n } from '@plcharriere/svelte-i18n';
+  import { t, setLocale, getLocales } from '../i18n';
 </script>
 
 <I18n />
@@ -160,7 +180,7 @@ Done. `/` renders English, `/fr` renders French, `setLocale('fr')` client-naviga
 
 | Export | Purpose |
 | --- | --- |
-| `createI18n(config)` | Setup. Returns the typed `t`. |
+| `createI18n(config)` | Setup. Returns the typed bundle (`t`, `setLocale`, `getCurrentLocale`, `getDefaultLocale`, `getLocales`, `isLoadingLocale`, `getLoadingLocale`). |
 | `t(key, params?)` | Typed translator. |
 | `setLocale(code)` | Switch locale, per-mode side effects. |
 | `getCurrentLocale()` | Active locale metadata. |
@@ -171,6 +191,8 @@ Done. `/` renders English, `/fr` renders French, `setLocale('fr')` client-naviga
 | `getSeoLinks(ctx?)` | Canonical / alternates / xDefault. On by default; pass `seo: false` to disable. |
 | `<I18n />` | Mount once in root layout. |
 | `schema()` / `typed<T>()` | Locale-file authoring. |
+
+The locale helpers (`setLocale` and friends) are re-exported standalone from `@plcharriere/svelte-i18n` with loose `string` typing — use those if you don't need locale-code type-checking.
 
 Server entry (`@plcharriere/svelte-i18n/server`): `createI18nHandle({ keyManifest? })`, `createI18nReroute()`, `getRequestLocale(event)`.
 

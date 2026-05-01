@@ -1,4 +1,10 @@
-export { createI18n, type TypedT } from './create.ts';
+export {
+	createI18n,
+	type I18nInstance,
+	type LocaleCodeOf,
+	type TypedLocaleInfo,
+	type TypedT
+} from './create.ts';
 export { schema, typed } from './schema.ts';
 export { setLocale, getCurrentLocale, getDefaultLocale, getLocales } from './locale.ts';
 export { isLoadingLocale, getLoadingLocale } from './loading.svelte.ts';

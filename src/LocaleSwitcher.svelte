@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { getCurrentLocale, getLocales, isLoadingLocale, setLocale } from '$lib';
-	import { t } from './i18n';
+	import { getCurrentLocale, getLocales, isLoadingLocale, setLocale, t } from './i18n';
 
 	const locales = getLocales();
 	const active = $derived(getCurrentLocale().code);
