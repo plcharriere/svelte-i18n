@@ -114,7 +114,7 @@ export const handle = createI18nHandle();
 ```ts
 // src/hooks.ts — path mode only
 import './i18n';
-import { createI18nReroute } from '@plcharriere/svelte-i18n/server';
+import { createI18nReroute } from '@plcharriere/svelte-i18n';
 
 export const reroute = createI18nReroute();
 ```
@@ -194,7 +194,7 @@ Done. `/` renders English, `/fr` renders French, `setLocale('fr')` client-naviga
 
 The locale helpers (`setLocale` and friends) are re-exported standalone from `@plcharriere/svelte-i18n` with loose `string` typing — use those if you don't need locale-code type-checking.
 
-Server entry (`@plcharriere/svelte-i18n/server`): `createI18nHandle({ keyManifest? })`, `createI18nReroute()`, `getRequestLocale(event)`.
+Server entry (`@plcharriere/svelte-i18n/server`): `createI18nHandle({ keyManifest? })`.
 
 Vite entry (`@plcharriere/svelte-i18n/vite`): `svelteI18n()` — see [Per-route scoping](#per-route-scoping).
 

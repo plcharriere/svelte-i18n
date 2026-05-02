@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
 import type { Handle } from '@sveltejs/kit';
 import { setServerLocaleAccessor } from './active-locale.ts';
 import { fallbackChain, getCurrentConfig } from './config.ts';
@@ -6,7 +7,12 @@ import { manifest as builtinManifest } from './manifest.ts';
 import { extractPathLocale } from './path-locale.ts';
 import { pruneDicts } from './prune.ts';
 import { resolveActiveLocale } from './resolver.ts';
-import { getServerLocale, runWithI18n } from './ssr-store.ts';
+import {
+	getServerLocale,
+	runWithI18n,
+	setStorage,
+	type RequestI18nState
+} from './ssr-store.ts';
 import type {
 	Dictionary,
 	I18nPageData,
@@ -15,6 +21,12 @@ import type {
 } from './types.ts';
 
 setServerLocaleAccessor(getServerLocale);
+
+const als = new AsyncLocalStorage<RequestI18nState>();
+setStorage({
+	run: (state, fn) => als.run(state, fn),
+	getStore: () => als.getStore()
+});
 
 export type I18nLocals = Required<Omit<I18nPageData, 'seo'>>;
 

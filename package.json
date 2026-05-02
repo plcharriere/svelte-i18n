@@ -1,6 +1,6 @@
 {
 	"name": "@plcharriere/svelte-i18n",
-	"version": "0.2.6",
+	"version": "0.2.7",
 	"description": "Typed, ICU-aware, SSR-safe i18n for SvelteKit 2 + Svelte 5 with per-route scoping.",
 	"keywords": [
 		"svelte",
@@ -68,7 +68,6 @@
 		"svelte": "^5.0.0"
 	},
 	"dependencies": {
-		"esm-env": "^1.2.2",
 		"intl-messageformat": "^11.2.1"
 	},
 	"pnpm": {

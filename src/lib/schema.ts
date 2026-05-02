@@ -1,9 +1,8 @@
-import { DEV } from 'esm-env';
 import type { Dictionary, TypedMessageBrand } from './types.ts';
 import { warn } from './warnings.ts';
 
 export function schema<T extends Dictionary>(obj: T): T {
-	if (DEV) validateSchemaKeys(obj);
+	if (import.meta.env.DEV) validateSchemaKeys(obj);
 	return obj;
 }
 

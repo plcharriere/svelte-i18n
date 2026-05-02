@@ -9,21 +9,19 @@ type Storage = {
 	getStore(): RequestI18nState | undefined;
 };
 
-let storage: Storage | null = null;
+let storage: Storage = {
+	run: (_state, fn) => fn(),
+	getStore: () => undefined
+};
 
-if (typeof window === 'undefined') {
-	const mod = await import('node:async_hooks');
-	const als = new mod.AsyncLocalStorage<RequestI18nState>();
-	storage = {
-		run: (state, fn) => als.run(state, fn),
-		getStore: () => als.getStore()
-	};
+export function setStorage(s: Storage): void {
+	storage = s;
 }
 
 export function runWithI18n<T>(state: RequestI18nState, fn: () => T): T {
-	return storage ? storage.run(state, fn) : fn();
+	return storage.run(state, fn);
 }
 
 export function getServerLocale(): LocaleCode | undefined {
-	return storage?.getStore()?.locale;
+	return storage.getStore()?.locale;
 }
