@@ -209,6 +209,12 @@ The locale is the first URL segment: `/en/about`, `/fr/about`. The default langu
 - **Best for:** SEO-critical sites — each translation has a distinct, crawlable URL.
 - **Switching:** `setLocale('fr')` client-navigates to the equivalent `/fr/...` URL, no full reload.
 - **Internal links:** write `<a href="/about">` as-is. The library rewrites unprefixed internal hrefs to carry the active locale — both in the SSR HTML (so crawlers, hover previews, copy-link, and middle-click see `/fr/about`) and in the DOM after a client-side switch. Default-locale pages stay unprefixed.
+- **Default-locale prefix (`/en/...` when default is `en`):** controlled by `defaultLocalePath`:
+  - `'redirect'` (default) — 301 from `/en/about` to `/about` so there's one canonical URL per page.
+  - `'allow'` — both `/about` and `/en/about` render. Two URLs serve the same content.
+  - `'404'` — `/en/about` returns Not Found. Strictest canonical.
+
+  Note: SvelteKit's per-route `trailingSlash` policy runs *before* this redirect, so visiting `/en` (no trailing slash) on a route configured with `trailingSlash = 'always'` will hit two redirects: SvelteKit's 308 to `/en/`, then our 301 to `/`. Either accept the cascade or set `trailingSlash = 'ignore'`.
 
 ### `cookie`
 
@@ -223,19 +229,20 @@ URLs stay the same across locales (`/about`). The active locale is read from a c
 The locale is picked by `event.url.host`. Each language declares one or more `domains: ['example.fr', 'fr.example.com']`.
 
 - **Best for:** multi-region deployments where each language lives on its own domain or subdomain.
-- **Switching:** `setLocale('fr')` navigates to the configured domain for `fr`. Unmapped hosts fall back to the default (or reject, see `domainFallback`).
+- **Switching:** `setLocale('fr')` navigates to the configured domain for `fr`. Unmapped hosts fall back to the default (or 404, see `domainFallback`).
 
 ## Config options
 
 ```ts
 createI18n({
-  mode: 'path',              // 'path' | 'cookie' | 'domain' (defaults to 'path')
+  mode: 'path',                  // 'path' | 'cookie' | 'domain' (defaults to 'path')
   defaultLocale: 'en',
+  defaultLocalePath: 'redirect', // 'redirect' | 'allow' | '404' — what to do with `/en/...` (path mode)
   locales: { ... },
 
   strict: false,             // throw instead of warn on missing keys / params
   cookieName: 'locale',      // cookie mode only
-  domainFallback: 'default', // 'default' | 'reject' (domain mode)
+  domainFallback: 'default', // 'default' | '404' (domain mode)
   seo: true,                 // pass `false` to suppress getSeoLinks() output
 
   // cookie mode only — cross-tab locale sync via BroadcastChannel

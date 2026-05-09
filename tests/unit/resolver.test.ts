@@ -213,7 +213,7 @@ describe('resolveActiveLocale', () => {
 		const strictDomain = normalizeConfig({
 			mode: 'domain',
 			defaultLocale: 'en',
-			domainFallback: 'reject',
+			domainFallback: '404',
 			locales: { en: { domains: ['example.com'] } }
 		});
 		const res = resolveActiveLocale(

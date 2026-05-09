@@ -50,7 +50,7 @@ export function resolveActiveLocale(
 	}
 	const match = resolveDomainLocale(event.url, config);
 	if (match) return { code: match };
-	if (config.domainFallback === 'reject') {
+	if (config.domainFallback === '404') {
 		return { code: config.defaultLocale, rejected: true };
 	}
 	return { code: config.defaultLocale };

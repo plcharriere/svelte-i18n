@@ -244,7 +244,7 @@ Path mode, cookie mode, and domain mode should be treated as distinct configurat
 
 - `strict?: boolean` — when `true`, validation events (missing keys, missing params, dotted schema keys, fallback-to-default, unknown locales) throw instead of emitting `console.warn`. Defaults to `false`.
 - `cookieName?: string` — name of the locale cookie used in `cookie` mode. Defaults to `'locale'`.
-- `domainFallback?: 'default' | 'reject'` — behavior in `domain` mode when the request host matches no configured locale. `'default'` serves the default language; `'reject'` returns a 404. Defaults to `'default'`.
+- `domainFallback?: 'default' | '404'` — behavior in `domain` mode when the request host matches no configured locale. `'default'` serves the default language; `'404'` returns a 404. Defaults to `'default'`.
 - `seo?: boolean` — gate for the SEO helper defined in §12. When `false`, `getSeoLinks()` returns `undefined` so callers can wire `seo: getSeoLinks(...)` unconditionally without emitting tags. Defaults to `true`.
 - `syncTabs?: boolean` — cross-tab locale sync via `BroadcastChannel` in `cookie` mode. Defaults to `true`. No effect outside cookie mode.
 - `syncChannel?: string` — `BroadcastChannel` name used when `syncTabs` is enabled. Defaults to `'svelte-i18n'`.

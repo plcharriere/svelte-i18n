@@ -50,6 +50,24 @@ export function createI18nHandle(options: I18nHandleOptions = {}): Handle {
 			return new Response('Not Found', { status: 404 });
 		}
 
+		if (config.mode === 'path' && config.defaultLocalePath !== 'allow') {
+			const { code: urlCode, rest } = extractPathLocale(
+				event.url.pathname,
+				config
+			);
+			if (urlCode === config.defaultLocale) {
+				if (config.defaultLocalePath === '404') {
+					return new Response('Not Found', { status: 404 });
+				}
+				const target = new URL(event.url);
+				target.pathname = rest;
+				return new Response(null, {
+					status: 301,
+					headers: { Location: target.toString() }
+				});
+			}
+		}
+
 		if (config.mode === 'cookie' && resolution.persistCookie) {
 			event.cookies.set(config.cookieName, resolution.persistCookie, {
 				path: '/',

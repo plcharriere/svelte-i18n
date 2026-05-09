@@ -41,10 +41,22 @@ export type I18nConfig<L extends LocalesMap = LocalesMap> = {
 	 */
 	mode?: RoutingMode;
 	defaultLocale?: LocaleCode;
+	/**
+	 * What to do when a request hits the default locale's prefixed path
+	 * (e.g. `/en/about` when the default locale is `en`). Path mode only —
+	 * ignored in cookie/domain modes.
+	 *
+	 * - `'redirect'` (default) — 301 from `/en/about` to `/about` (the
+	 *   unprefixed canonical). One canonical URL per page.
+	 * - `'allow'` — both `/about` and `/en/about` render. Two URLs serve
+	 *   the same content.
+	 * - `'404'` — `/en/about` returns Not Found. Strictest canonical.
+	 */
+	defaultLocalePath?: 'redirect' | 'allow' | '404';
 	locales: L;
 	strict?: boolean;
 	cookieName?: string;
-	domainFallback?: 'default' | 'reject';
+	domainFallback?: 'default' | '404';
 	/**
 	 * Emit `<link rel="canonical">` + hreflang alternates from `<I18n />`.
 	 * Defaults to `true`. Pass `false` to suppress the library's SEO output
@@ -67,12 +79,13 @@ export type I18nConfig<L extends LocalesMap = LocalesMap> = {
 export type ResolvedI18nConfig = {
 	mode: RoutingMode;
 	defaultLocale: LocaleCode;
+	defaultLocalePath: 'redirect' | 'allow' | '404';
 	locales: Record<LocaleCode, ResolvedLocaleDefinition>;
 	codes: LocaleCode[];
 	loaders: LocaleLoaderMap;
 	strict: boolean;
 	cookieName: string;
-	domainFallback: 'default' | 'reject';
+	domainFallback: 'default' | '404';
 	seo: boolean;
 	syncTabs: boolean;
 	syncChannel: string;

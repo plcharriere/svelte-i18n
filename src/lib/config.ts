@@ -60,9 +60,13 @@ export function normalizeConfig<L extends LocalesMap>(
 		if (def.load) loaders[code] = def.load;
 	}
 
+	const mode = config.mode ?? 'path';
+	const defaultLocalePath = config.defaultLocalePath ?? 'redirect';
+
 	return {
-		mode: config.mode ?? 'path',
+		mode,
 		defaultLocale,
+		defaultLocalePath,
 		locales,
 		codes: Object.keys(locales),
 		loaders,
