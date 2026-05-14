@@ -1,6 +1,6 @@
 import { getCookieBroadcastChannel } from './broadcast.ts';
 import { getCurrentConfig } from './config.ts';
-import { getI18nContext } from './context.svelte.ts';
+import { setActiveCode } from './client.svelte.ts';
 import { suspendInterception } from './intercept.ts';
 import { setLoadingLocale } from './loading.svelte.ts';
 import { extractPathLocale } from './path-locale.ts';
@@ -71,8 +71,7 @@ export async function setLocale(code: LocaleCode): Promise<void> {
 			} finally {
 				release();
 			}
-			const ctx = getI18nContext();
-			if (ctx) ctx.code = code;
+			setActiveCode(code);
 		} finally {
 			setLoadingLocale(undefined);
 		}
@@ -87,8 +86,7 @@ export async function setLocale(code: LocaleCode): Promise<void> {
 			document.cookie = `${config.cookieName}=${encodeURIComponent(
 				code
 			)}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
-			const ctx = getI18nContext();
-			if (ctx) ctx.code = code;
+			setActiveCode(code);
 			getCookieBroadcastChannel()?.postMessage(code);
 
 			const url = new URL(window.location.href);

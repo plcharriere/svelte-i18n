@@ -15,8 +15,8 @@
 		"ssr"
 	],
 	"license": "MIT",
-	"author": "Paul-Louis Charriere",
-	"homepage": "https://github.com/plcharriere/svelte-i18n#readme",
+	"author": "Paul-Louis Charrière",
+	"homepage": "https://github.com/plcharriere/svelte-i18n",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/plcharriere/svelte-i18n.git"

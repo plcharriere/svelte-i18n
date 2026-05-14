@@ -88,4 +88,100 @@ describe('getSeoLinks', () => {
 			getSeoLinks({ url: 'https://example.com/fr/about', locale: 'fr' })
 		).toBeUndefined();
 	});
+
+	it('path mode at root canonicalises to the unprefixed default URL', () => {
+		setCurrentConfig(
+			normalizeConfig({
+				mode: 'path',
+				seo: true,
+				defaultLocale: 'en',
+				locales: { en: {}, fr: {} }
+			})
+		);
+		const seo = getSeoLinks({ url: 'https://example.com/', locale: 'en' })!;
+		expect(seo.canonical).toBe('https://example.com/');
+		expect(seo.alternates).toContainEqual({
+			hreflang: 'fr',
+			href: 'https://example.com/fr/'
+		});
+	});
+
+	it('path mode strips the locale prefix from the canonical path', () => {
+		setCurrentConfig(
+			normalizeConfig({
+				mode: 'path',
+				seo: true,
+				defaultLocale: 'en',
+				locales: { en: {}, fr: {} }
+			})
+		);
+		// Same canonical regardless of which prefix the request used.
+		const fromFr = getSeoLinks({
+			url: 'https://example.com/fr/about',
+			locale: 'fr'
+		})!;
+		const fromEn = getSeoLinks({
+			url: 'https://example.com/about',
+			locale: 'en'
+		})!;
+		expect(fromFr.xDefault).toBe('https://example.com/about');
+		expect(fromEn.xDefault).toBe('https://example.com/about');
+	});
+
+	it('domain mode: returns origin URL when locale has no configured domain', () => {
+		setCurrentConfig(
+			normalizeConfig({
+				mode: 'domain',
+				seo: true,
+				defaultLocale: 'en',
+				locales: {
+					en: { domains: ['example.com'] },
+					fr: { domains: ['example.fr'] },
+					ar: {}
+				}
+			})
+		);
+		const seo = getSeoLinks({
+			url: 'https://example.com/about',
+			locale: 'en'
+		})!;
+		// `ar` has no domain — its alternate falls back to the request URL.
+		expect(
+			seo.alternates.find((a) => a.hreflang === 'ar')?.href
+		).toBe('https://example.com/about');
+	});
+
+	it('accepts a URL object for context.url', () => {
+		setCurrentConfig(
+			normalizeConfig({
+				mode: 'path',
+				seo: true,
+				defaultLocale: 'en',
+				locales: { en: {}, fr: {} }
+			})
+		);
+		const seo = getSeoLinks({
+			url: new URL('https://example.com/fr/about'),
+			locale: 'fr'
+		})!;
+		expect(seo.canonical).toBe('https://example.com/fr/about');
+	});
+
+	it('uses getActiveLocale when no locale is passed in context', async () => {
+		const { setServerLocaleAccessor } = await import(
+			'../../src/lib/active-locale.ts'
+		);
+		setServerLocaleAccessor(() => 'fr');
+		setCurrentConfig(
+			normalizeConfig({
+				mode: 'path',
+				seo: true,
+				defaultLocale: 'en',
+				locales: { en: {}, fr: {} }
+			})
+		);
+		const seo = getSeoLinks({ url: 'https://example.com/fr/about' })!;
+		expect(seo.canonical).toBe('https://example.com/fr/about');
+		setServerLocaleAccessor(() => undefined);
+	});
 });

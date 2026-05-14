@@ -10,11 +10,6 @@ export { setLocale, getCurrentLocale, getDefaultLocale, getLocales } from './loc
 export { isLoadingLocale, getLoadingLocale } from './loading.svelte.ts';
 export { createI18nReroute, getRequestLocale } from './reroute.ts';
 export { getSeoLinks, type SeoContext } from './seo.ts';
-export {
-	createI18nContext,
-	getI18nContext,
-	type I18nContext
-} from './context.svelte.ts';
 export { default as I18n } from './I18n.svelte';
 export {
 	primeDictionary,

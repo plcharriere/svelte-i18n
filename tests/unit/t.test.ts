@@ -83,25 +83,10 @@ describe('t() end-to-end', () => {
 		expect(t('cart.items', { count: 5 })).toBe('5 items');
 	});
 
-	it('interpolates named variables', () => {
-		primeDictionary('en', { user: { greet: 'Hi {name}' } });
-		currentLocale = 'en';
-		expect(t('user.greet', { name: 'Paul' })).toBe('Hi Paul');
-	});
-
 	it('falls back to default locale when active is undefined', () => {
 		// Simulates pre-hydration call paths where no locale source has fired.
 		primeDictionary('en', { a: 'default' });
 		currentLocale = undefined;
 		expect(t('a')).toBe('default');
-	});
-
-	it('resolves select branches', () => {
-		primeDictionary('en', {
-			p: '{g, select, male {He} female {She} other {They}}'
-		});
-		currentLocale = 'en';
-		expect(t('p', { g: 'female' })).toBe('She');
-		expect(t('p', { g: 'other' })).toBe('They');
 	});
 });

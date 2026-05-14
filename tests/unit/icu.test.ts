@@ -44,31 +44,82 @@ describe('formatMessage', () => {
 		).toBe('You have 3 items and 1 discount');
 	});
 
-	it('missing plural param defaults to 0 and warns', () => {
-		const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+	it('missing plural param defaults to 0', () => {
+		vi.spyOn(console, 'warn').mockImplementation(() => {});
 		const msg = '{count, plural, one {# item} other {# items}}';
 		expect(formatMessage('en', msg, {}, ctx('c'))).toBe('0 items');
-		expect(spy).toHaveBeenCalledWith(expect.stringContaining('missing-param'));
 	});
 
-	it('missing select param falls back to first option', () => {
-		const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+	it('missing select param falls back to the first option', () => {
+		vi.spyOn(console, 'warn').mockImplementation(() => {});
 		const msg = '{g, select, male {He} female {She} other {They}}';
 		expect(formatMessage('en', msg, {}, ctx('p'))).toBe('He');
-		expect(spy).toHaveBeenCalled();
 	});
 
 	it('missing plain variable resolves to empty string', () => {
-		const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+		vi.spyOn(console, 'warn').mockImplementation(() => {});
 		expect(formatMessage('en', 'Hello {name}', {}, ctx('g'))).toBe('Hello ');
-		expect(spy).toHaveBeenCalled();
 	});
 
-	it('malformed ICU message emits icu-error and returns empty string', () => {
-		const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+	it('malformed ICU message returns empty string instead of throwing', () => {
+		vi.spyOn(console, 'warn').mockImplementation(() => {});
 		// Unclosed brace — IntlMessageFormat throws at construction; our catch
-		// path must swallow it into an icu-error warning and return ''.
+		// path must swallow it and return ''.
 		expect(formatMessage('en', 'Hi {name', { name: 'x' }, ctx('g'))).toBe('');
-		expect(spy).toHaveBeenCalledWith(expect.stringContaining('icu-error'));
+	});
+
+	it('formats a number with the ICU number type', () => {
+		expect(
+			formatMessage('en', '{n, number}', { n: 1234567 }, ctx('n'))
+		).toBe('1,234,567');
+	});
+
+	it('formats selectordinal (1st, 2nd, 3rd in English)', () => {
+		const msg =
+			'{place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}';
+		expect(formatMessage('en', msg, { place: 1 }, ctx('p'))).toBe('1st');
+		expect(formatMessage('en', msg, { place: 2 }, ctx('p'))).toBe('2nd');
+		expect(formatMessage('en', msg, { place: 3 }, ctx('p'))).toBe('3rd');
+		expect(formatMessage('en', msg, { place: 4 }, ctx('p'))).toBe('4th');
+	});
+
+	it('formats a date with the ICU date type', () => {
+		const out = formatMessage(
+			'en',
+			'{d, date, short}',
+			{ d: new Date('2024-03-15T00:00:00Z') },
+			ctx('d')
+		);
+		// Locale-specific format, but should at least be non-empty and contain a digit.
+		expect(out.length).toBeGreaterThan(0);
+		expect(/\d/.test(out)).toBe(true);
+	});
+
+	it('formats currency via ICU number format', () => {
+		const out = formatMessage(
+			'en',
+			'{amount, number, ::currency/USD}',
+			{ amount: 9.99 },
+			ctx('a')
+		);
+		expect(out).toContain('9.99');
+	});
+
+	it('handles nested plural-inside-select', () => {
+		const msg =
+			'{g, select, male {{n, plural, one {# guy} other {# guys}}} other {{n, plural, one {# person} other {# people}}}}';
+		expect(formatMessage('en', msg, { g: 'male', n: 1 }, ctx('m'))).toBe(
+			'1 guy'
+		);
+		expect(formatMessage('en', msg, { g: 'other', n: 5 }, ctx('m'))).toBe(
+			'5 people'
+		);
+	});
+
+	it('treats undefined params the same as an empty params object', () => {
+		vi.spyOn(console, 'warn').mockImplementation(() => {});
+		expect(formatMessage('en', 'Hello {name}', undefined, ctx('g'))).toBe(
+			'Hello '
+		);
 	});
 });

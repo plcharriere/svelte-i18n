@@ -1,7 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { describe, expect, it } from 'vitest';
 import { normalizeConfig } from '../../src/lib/config.ts';
-import { extractPathLocale } from '../../src/lib/path-locale.ts';
 import {
 	resolveActiveLocale,
 	resolveCookieLocale,
@@ -9,92 +8,17 @@ import {
 	resolvePathLocale
 } from '../../src/lib/resolver.ts';
 
+// extractPathLocale itself is exhaustively tested in path-locale.test.ts.
+// This file focuses on the resolver layer that consumes it.
+
 const pathConfig = normalizeConfig({
 	mode: 'path',
 	defaultLocale: 'en',
 	locales: {
 		en: {},
 		fr: {},
-		'en-GB': { parent: 'en' },
-		pt: {},
-		zh: {},
-		'zh-Hant': { parent: 'zh' },
-		'zh-Hant-CN': { parent: 'zh-Hant' },
-		es: {},
-		'es-419': { parent: 'es' }
+		'en-GB': { parent: 'en' }
 	}
-});
-
-describe('extractPathLocale', () => {
-	it('recognises known locale prefix', () => {
-		expect(extractPathLocale('/fr/about', pathConfig)).toEqual({
-			code: 'fr',
-			rest: '/about'
-		});
-	});
-
-	it('recognises variants like en-GB', () => {
-		expect(extractPathLocale('/en-GB/cart', pathConfig)).toEqual({
-			code: 'en-GB',
-			rest: '/cart'
-		});
-	});
-
-	it('returns undefined for unknown prefix', () => {
-		expect(extractPathLocale('/about', pathConfig)).toEqual({
-			code: undefined,
-			rest: '/about'
-		});
-	});
-
-	it('rest defaults to / when nothing after prefix', () => {
-		expect(extractPathLocale('/fr', pathConfig)).toEqual({
-			code: 'fr',
-			rest: '/'
-		});
-	});
-
-	it('matches BCP-47 script subtags (zh-Hant)', () => {
-		expect(extractPathLocale('/zh-Hant/about', pathConfig)).toEqual({
-			code: 'zh-Hant',
-			rest: '/about'
-		});
-	});
-
-	it('matches BCP-47 script + region (zh-Hant-CN)', () => {
-		expect(extractPathLocale('/zh-Hant-CN/about', pathConfig)).toEqual({
-			code: 'zh-Hant-CN',
-			rest: '/about'
-		});
-	});
-
-	it('matches UN M.49 numeric regions (es-419)', () => {
-		expect(extractPathLocale('/es-419/about', pathConfig)).toEqual({
-			code: 'es-419',
-			rest: '/about'
-		});
-	});
-
-	it('case-insensitively matches configured variants (en-gb → en-GB)', () => {
-		expect(extractPathLocale('/en-gb/about', pathConfig)).toEqual({
-			code: 'en-GB',
-			rest: '/about'
-		});
-	});
-
-	it('preserves trailing slash on the rest path', () => {
-		expect(extractPathLocale('/fr/about/', pathConfig)).toEqual({
-			code: 'fr',
-			rest: '/about/'
-		});
-	});
-
-	it('rejects a language-shaped prefix that is not configured', () => {
-		expect(extractPathLocale('/xx/about', pathConfig)).toEqual({
-			code: undefined,
-			rest: '/xx/about'
-		});
-	});
 });
 
 describe('resolvePathLocale', () => {

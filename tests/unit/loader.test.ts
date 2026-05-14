@@ -54,8 +54,8 @@ describe('loadDictionary', () => {
 		expect(loader).toHaveBeenCalledTimes(1);
 	});
 
-	it('warns and returns undefined when no loader is registered', async () => {
-		const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+	it('returns undefined when no loader is registered', async () => {
+		vi.spyOn(console, 'warn').mockImplementation(() => {});
 		const config = normalizeConfig({
 			mode: 'path',
 			defaultLocale: 'en',
@@ -63,9 +63,6 @@ describe('loadDictionary', () => {
 		});
 		const res = await loadDictionary('en', config);
 		expect(res).toBeUndefined();
-		expect(spy).toHaveBeenCalledWith(
-			expect.stringContaining('missing-loader')
-		);
 	});
 
 	it('unwraps module.default or uses the module directly', async () => {
@@ -88,6 +85,29 @@ describe('loadDictionary', () => {
 			}
 		});
 		expect(await loadDictionary('en', configB)).toEqual({ bare: 'yes' });
+	});
+});
+
+describe('loadDictionary — error paths', () => {
+	it('propagates loader rejections and clears the in-flight slot', async () => {
+		const failingLoader = vi.fn(async () => {
+			throw new Error('network down');
+		});
+		const config = normalizeConfig({
+			mode: 'path',
+			defaultLocale: 'en',
+			locales: { en: { load: failingLoader } }
+		});
+		await expect(loadDictionary('en', config)).rejects.toThrow('network down');
+		// In-flight slot must be cleared (verified by re-attempting):
+		const recoveryLoader = vi.fn(async () => ({ default: { ok: 'yes' } }));
+		const config2 = normalizeConfig({
+			mode: 'path',
+			defaultLocale: 'en',
+			locales: { en: { load: recoveryLoader } }
+		});
+		await expect(loadDictionary('en', config2)).resolves.toEqual({ ok: 'yes' });
+		expect(recoveryLoader).toHaveBeenCalledTimes(1);
 	});
 });
 

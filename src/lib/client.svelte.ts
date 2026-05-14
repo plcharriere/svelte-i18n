@@ -13,11 +13,6 @@ import type {
 	ResolvedI18nConfig
 } from './types.ts';
 
-export type I18nContext = {
-	get code(): LocaleCode;
-	set code(value: LocaleCode);
-};
-
 let code = $state<LocaleCode | undefined>(undefined);
 
 if (typeof window !== 'undefined') {
@@ -36,20 +31,19 @@ if (typeof window !== 'undefined') {
 	}
 }
 
-const store: I18nContext = {
-	get code() {
-		const c = code ?? peekCurrentConfig()?.defaultLocale;
-		if (!c) {
-			throw new Error(
-				'[svelte-i18n] Active locale requested before createI18n() was called.'
-			);
-		}
-		return c;
-	},
-	set code(value: LocaleCode) {
-		code = value;
+export function setActiveCode(value: LocaleCode): void {
+	code = value;
+}
+
+function getActiveCode(): LocaleCode {
+	const c = code ?? peekCurrentConfig()?.defaultLocale;
+	if (!c) {
+		throw new Error(
+			'[svelte-i18n] Active locale requested before createI18n() was called.'
+		);
 	}
-};
+	return c;
+}
 
 function primeChain(data: I18nPageData): void {
 	if (!data.dictionaries) return;
@@ -58,25 +52,25 @@ function primeChain(data: I18nPageData): void {
 	}
 }
 
-export function createI18nContext(
+export function setupI18n(
 	source: I18nPageData | (() => I18nPageData)
-): I18nContext {
+): void {
 	const read = typeof source === 'function' ? source : () => source;
-	if (typeof window === 'undefined') return store;
+	if (typeof window === 'undefined') return;
 
 	const initial = read();
 	if (code === undefined) code = initial.locale;
 	primeChain(initial);
 
+	const data = $derived(read());
+
 	$effect.pre(() => {
-		const data = read();
 		primeChain(data);
 		if (code !== data.locale) code = data.locale;
 	});
 
 	$effect(() => {
 		if (typeof document === 'undefined') return;
-		const data = read();
 		document.documentElement.lang = data.locale;
 		document.documentElement.dir = data.rtl ? 'rtl' : 'ltr';
 
@@ -95,7 +89,7 @@ export function createI18nContext(
 		const { code: urlCode } = extractPathLocale(nav.to.url.pathname, config);
 		if (urlCode) return;
 
-		const active = store.code;
+		const active = getActiveCode();
 		if (active === config.defaultLocale) return;
 
 		nav.cancel();
@@ -117,13 +111,6 @@ export function createI18nContext(
 		channel.addEventListener('message', onMessage);
 		$effect(() => () => channel.removeEventListener('message', onMessage));
 	}
-
-	return store;
-}
-
-export function getI18nContext(): I18nContext | undefined {
-	if (code === undefined) return undefined;
-	return store;
 }
 
 function rewriteAnchors(

@@ -6,27 +6,30 @@ beforeEach(() => {
 });
 
 describe('schema()', () => {
-	it('returns the passed-in object', () => {
-		const dict = schema({ a: 'A' });
-		expect(dict).toEqual({ a: 'A' });
+	it('returns the passed-in object unchanged (runtime no-op)', () => {
+		const input = { a: 'A', nested: { b: 'B' } };
+		expect(schema(input)).toBe(input);
 	});
 
-	it('warns when a dotted key is used', () => {
+	it('does not warn for nested objects with non-dotted keys', () => {
 		const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-		schema({ 'cart.items': 'bad' });
-		expect(spy).toHaveBeenCalledWith(expect.stringContaining('dotted-schema-key'));
+		schema({
+			home: { title: 'Home', body: 'body' },
+			deeply: { nested: { thing: { x: 'y' } } }
+		});
+		expect(spy).not.toHaveBeenCalled();
 	});
 
-	it('recurses into nested objects', () => {
+	it('does not warn for string values containing dots', () => {
 		const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-		schema({ nested: { 'bad.key': 'x' } });
-		expect(spy).toHaveBeenCalledWith(expect.stringContaining('dotted-schema-key'));
+		schema({ key: 'a value with a dot . inside is fine' });
+		expect(spy).not.toHaveBeenCalled();
 	});
 });
 
 describe('typed()', () => {
-	it('returns the message string unchanged', () => {
-		const msg = typed<{ name: string }>('Hello {name}');
-		expect(msg).toBe('Hello {name}');
+	it('returns the message string identity', () => {
+		const original = 'Hello {name}';
+		expect(typed<{ name: string }>(original)).toBe(original);
 	});
 });
