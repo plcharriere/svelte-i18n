@@ -12,10 +12,7 @@ describe('getSeoLinks', () => {
 				locales: { en: {}, fr: {}, 'en-GB': { parent: 'en' } }
 			})
 		);
-		const seo = getSeoLinks({
-			url: 'https://example.com/fr/about',
-			locale: 'fr'
-		})!;
+		const seo = getSeoLinks({ url: 'https://example.com/fr/about', locale: 'fr' })!;
 		expect(seo.canonical).toBe('https://example.com/fr/about');
 		// Default locale is always unprefixed — one canonical form per page.
 		expect(seo.alternates).toEqual([
@@ -35,10 +32,7 @@ describe('getSeoLinks', () => {
 				locales: { en: {}, fr: {}, 'en-GB': { parent: 'en' } }
 			})
 		);
-		const seo = getSeoLinks({
-			url: 'https://example.com/about?lang=fr',
-			locale: 'fr'
-		})!;
+		const seo = getSeoLinks({ url: 'https://example.com/about?lang=fr', locale: 'fr' })!;
 		expect(seo.canonical).toBe('https://example.com/about?lang=fr');
 		expect(seo.xDefault).toBe('https://example.com/about');
 		// Default locale has no ?lang= — it's the unparameterized canonical form.
@@ -60,10 +54,7 @@ describe('getSeoLinks', () => {
 				}
 			})
 		);
-		const seo = getSeoLinks({
-			url: 'https://example.fr/about',
-			locale: 'fr'
-		})!;
+		const seo = getSeoLinks({ url: 'https://example.fr/about', locale: 'fr' })!;
 		expect(seo.canonical).toBe('https://example.fr/about');
 		expect(seo.alternates).toContainEqual({
 			hreflang: 'fr',
@@ -116,14 +107,8 @@ describe('getSeoLinks', () => {
 			})
 		);
 		// Same canonical regardless of which prefix the request used.
-		const fromFr = getSeoLinks({
-			url: 'https://example.com/fr/about',
-			locale: 'fr'
-		})!;
-		const fromEn = getSeoLinks({
-			url: 'https://example.com/about',
-			locale: 'en'
-		})!;
+		const fromFr = getSeoLinks({ url: 'https://example.com/fr/about', locale: 'fr' })!;
+		const fromEn = getSeoLinks({ url: 'https://example.com/about', locale: 'en' })!;
 		expect(fromFr.xDefault).toBe('https://example.com/about');
 		expect(fromEn.xDefault).toBe('https://example.com/about');
 	});
@@ -141,17 +126,14 @@ describe('getSeoLinks', () => {
 				}
 			})
 		);
-		const seo = getSeoLinks({
-			url: 'https://example.com/about',
-			locale: 'en'
-		})!;
+		const seo = getSeoLinks({ url: 'https://example.com/about', locale: 'en' })!;
 		// `ar` has no domain — its alternate falls back to the request URL.
 		expect(
 			seo.alternates.find((a) => a.hreflang === 'ar')?.href
 		).toBe('https://example.com/about');
 	});
 
-	it('accepts a URL object for context.url', () => {
+	it('accepts a URL object for url', () => {
 		setCurrentConfig(
 			normalizeConfig({
 				mode: 'path',
@@ -160,17 +142,13 @@ describe('getSeoLinks', () => {
 				locales: { en: {}, fr: {} }
 			})
 		);
-		const seo = getSeoLinks({
-			url: new URL('https://example.com/fr/about'),
-			locale: 'fr'
-		})!;
+		const seo = getSeoLinks({ url: new URL('https://example.com/fr/about'), locale: 'fr' })!;
 		expect(seo.canonical).toBe('https://example.com/fr/about');
 	});
 
-	it('uses getActiveLocale when no locale is passed in context', async () => {
+	it('uses getActiveLocale when locale is omitted', async () => {
 		const { setServerLocaleAccessor } = await import(
-			'../../src/lib/active-locale.ts'
-		);
+			'../../src/lib/active-locale.ts');
 		setServerLocaleAccessor(() => 'fr');
 		setCurrentConfig(
 			normalizeConfig({

@@ -119,6 +119,22 @@ import { createI18nReroute } from '@plcharriere/svelte-i18n';
 export const reroute = createI18nReroute();
 ```
 
+```html
+<!-- src/app.html -->
+<!doctype html>
+<html lang="%locale%" dir="%dir%">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="text-scale" content="scale" />
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>
+```
+
 ```ts
 // src/app.d.ts
 import type { I18nLocals } from '@plcharriere/svelte-i18n/server';
@@ -188,7 +204,7 @@ Done. `/` renders English, `/fr` renders French, `setLocale('fr')` client-naviga
 | `getLocales()` | All configured locales. |
 | `isLoadingLocale(code?)` | Reactive: `true` while a `setLocale` is in flight. With `code`, only `true` while switching to that specific locale. |
 | `getLoadingLocale()` | Reactive: the locale currently being switched to, or `undefined`. |
-| `getSeoLinks(ctx?)` | Canonical / alternates / xDefault. On by default; pass `seo: false` to disable. |
+| `getSeoLinks({ url?, locale? })` | Canonical / alternates / xDefault. On by default; pass `seo: false` in `createI18n` to disable. |
 | `<I18n />` | Mount once in root layout. |
 | `schema()` / `typed<T>()` | Locale-file authoring. |
 

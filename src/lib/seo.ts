@@ -3,22 +3,22 @@ import { getCurrentConfig } from './config.ts';
 import { getActiveLocale } from './active-locale.ts';
 import type { SeoLinks } from './types.ts';
 
-export type SeoContext = {
-	url: URL | string;
+export function getSeoLinks(options?: {
+	url?: URL | string;
 	locale?: string;
-};
-
-export function getSeoLinks(context?: SeoContext): SeoLinks | undefined {
+}): SeoLinks | undefined {
 	const config = getCurrentConfig();
 	if (!config.seo) return undefined;
 	const url = new URL(
-		typeof context?.url === 'string'
-			? context.url
-			: context?.url?.toString() ??
-				(typeof window !== 'undefined' ? window.location.href : 'http://localhost/')
+		typeof options?.url === 'string'
+			? options.url
+			: options?.url?.toString() ??
+				(typeof window !== 'undefined'
+					? window.location.href
+					: 'http://localhost/')
 	);
 	const activeLocale =
-		context?.locale ?? getActiveLocale() ?? config.defaultLocale;
+		options?.locale ?? getActiveLocale() ?? config.defaultLocale;
 
 	const canonicalPath = stripLocaleFromPath(url.pathname, config);
 

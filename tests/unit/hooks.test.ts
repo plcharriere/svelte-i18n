@@ -151,25 +151,17 @@ describe('createI18nHandle — path mode', () => {
 		expect(response.status).toBe(404);
 	});
 
-	it('rewrites <html lang="..." dir="..."> in transformed HTML', async () => {
+	it('substitutes %locale% and %dir% placeholders in the rendered HTML', async () => {
 		setPathConfig();
 		const event = makeEvent('http://x/fr/about');
 		const { transformedHtml } = await callHandle(
 			event,
-			'<!doctype html><html lang="en" dir="ltr"><head></head><body></body></html>'
+			'<!doctype html><html lang="%locale%" dir="%dir%"><head></head><body></body></html>'
 		);
 		expect(transformedHtml).toContain('lang="fr"');
 		expect(transformedHtml).toContain('dir="ltr"');
-	});
-
-	it('adds lang/dir if missing', async () => {
-		setPathConfig();
-		const event = makeEvent('http://x/fr/about');
-		const { transformedHtml } = await callHandle(
-			event,
-			'<!doctype html><html><head></head><body></body></html>'
-		);
-		expect(transformedHtml).toContain('<html lang="fr" dir="ltr"');
+		expect(transformedHtml).not.toContain('%locale%');
+		expect(transformedHtml).not.toContain('%dir%');
 	});
 
 	it('rewrites unprefixed internal anchors and leaves the rest alone', async () => {
@@ -261,7 +253,7 @@ describe('createI18nHandle — cookie mode', () => {
 });
 
 describe('createI18nHandle — RTL', () => {
-	it('writes dir="rtl" in HTML and exposes rtl on event.locals.i18n', async () => {
+	it('substitutes dir="rtl" and exposes rtl on event.locals.i18n', async () => {
 		setCurrentConfig(
 			normalizeConfig({
 				mode: 'path',
@@ -273,9 +265,10 @@ describe('createI18nHandle — RTL', () => {
 		const event = makeEvent('http://x/ar/about');
 		const { transformedHtml } = await callHandle(
 			event,
-			'<!doctype html><html><head></head><body></body></html>'
+			'<!doctype html><html lang="%locale%" dir="%dir%"><head></head><body></body></html>'
 		);
-		expect(transformedHtml).toContain('<html lang="ar" dir="rtl"');
+		expect(transformedHtml).toContain('lang="ar"');
+		expect(transformedHtml).toContain('dir="rtl"');
 		expect((event.locals as { i18n: { rtl: boolean } }).i18n.rtl).toBe(true);
 	});
 });

@@ -104,16 +104,9 @@ export function createI18nHandle(options: I18nHandleOptions = {}): Handle {
 			resolve(event, {
 				transformPageChunk: ({ html, done }) => {
 					if (!done) return html;
-					let out = html.replace(/<html\b[^>]*>/, (htmlTag) => {
-						let next = htmlTag
-							.replace(/\s+lang="[^"]*"/, '')
-							.replace(/\s+dir="[^"]*"/, '');
-						next = next.replace(
-							/^<html/,
-							`<html lang="${resolution.code}" dir="${dir}"`
-						);
-						return next;
-					});
+					let out = html
+						.replace('%locale%', resolution.code)
+						.replace('%dir%', dir);
 					if (
 						config.mode === 'path' &&
 						resolution.code !== config.defaultLocale
